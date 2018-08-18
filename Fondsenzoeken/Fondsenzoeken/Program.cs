@@ -20,26 +20,41 @@ namespace Fondsenzoeken
             var linl = "https://www.fondsenzoeken.nl/public/profielen/{id}";
             var readAllText = File.ReadAllText(@"E:\jk.json");
             var deserializeObject = JsonConvert.DeserializeObject<List<Class1>>(readAllText);
-            FirefoxDriver client = new FirefoxDriver();
-            List<Model> list=new List<Model>();
+            FirefoxProfile firefoxOption = new FirefoxProfile();
+            firefoxOption.SetPreference("permissions.default.stylesheet", 2);
+            firefoxOption.SetPreference("permissions.default.image", 2);
+            firefoxOption.SetPreference("dom.ipc.plugins.enabled.libflashplayer.so", false);
+            FirefoxOptions fire = new FirefoxOptions();
+            fire.Profile = firefoxOption;
+            FirefoxDriver client = new FirefoxDriver(fire);
+            List<Model> list = new List<Model>();
+            var temp = "";
             foreach (var class1 in deserializeObject)
             {
-                
-                HtmlAgilityPack.HtmlDocument document = new HtmlDocument();
                 client.Navigate().GoToUrl(linl.Replace("{id}", class1.id.ToString()));
-                Thread.Sleep(1000);
-                var clientPageSource = client.PageSource;
-                document.LoadHtml(clientPageSource);
-                var innerHtml = document.DocumentNode.SelectSingleNode(".//div[@class='blok clearfix']");
-                var email = innerHtml.SelectSingleNode(".//a[@href='mailto:']").InnerText;
-                var org = innerHtml.SelectSingleNode(".//dd[@class='ng-binding']").InnerText;
-                var web = innerHtml.SelectSingleNode(".//a[@class='new ng-binding']").InnerText;
-                list.Add(new Model{email = email,name = org,web = web});
-                
+                HtmlAgilityPack.HtmlDocument document = new HtmlDocument();
+                L: Thread.Sleep(700);
+                if (temp != client.PageSource) document.LoadHtml(client.PageSource);
+                else goto L;
+                try
+                {
+                    temp = client.PageSource;
+                    var innerHtml = document.DocumentNode.SelectSingleNode(".//div[@class='blok clearfix']");
+                    var email = innerHtml.SelectSingleNode(".//a[@href='mailto:']").InnerText;
+                    var org = innerHtml.SelectSingleNode(".//dd[@class='ng-binding']").InnerText;
+                    var web = innerHtml.SelectSingleNode(".//a[@class='new ng-binding']").InnerText;
+                    list.Add(new Model { email = email, name = org, web = web });
+                }
+                catch (Exception e)
+                {
+                    goto L;
+                }
+
             }
 
             var serializeObject = JsonConvert.SerializeObject(list);
             File.WriteAllText("E:\\col.json", serializeObject);
+            Console.WriteLine("complete");
         }
     }
 }
