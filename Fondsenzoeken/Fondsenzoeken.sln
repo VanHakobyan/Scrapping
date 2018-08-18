@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2003
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fondsenzoeken", "Fondsenzoeken\Fondsenzoeken.csproj", "{98A44018-FB02-4CDB-81FA-A8613486719B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{98A44018-FB02-4CDB-81FA-A8613486719B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98A44018-FB02-4CDB-81FA-A8613486719B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98A44018-FB02-4CDB-81FA-A8613486719B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98A44018-FB02-4CDB-81FA-A8613486719B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {775E7ECB-07E1-40A9-B83A-C5D7B276BFD4}
+	EndGlobalSection
+EndGlobal
