@@ -13,18 +13,12 @@ namespace LSelenium
 {
     class Program
     {
-        private static string link =
+         private static string link =
             @"https://www.lexusofedmonton.ca/used-vehicles/#action=im_ajax_call&perform=get_results&page=1&type%5B%5D=Used&type%5B%5D=Certified+Used";
         static void Main(string[] args)
         {
             var urls = new List<string>();
-            FirefoxProfile firefoxOption = new FirefoxProfile();
-            //firefoxOption.SetPreference("permissions.default.stylesheet", 2);
-            //firefoxOption.SetPreference("permissions.default.image", 2);
-            //firefoxOption.SetPreference("dom.ipc.plugins.enabled.libflashplayer.so", false);
-            FirefoxOptions fire = new FirefoxOptions();
-            fire.Profile = firefoxOption;
-            FirefoxDriver driver = new FirefoxDriver(fire);
+            PhantomJSDriver driver=new PhantomJSDriver();
             driver.Navigate().GoToUrl(link);
             for (int i = 1; i < 9; i++)
             {
@@ -42,8 +36,8 @@ namespace LSelenium
                 pages.ElementAt(i).Click();
                 Thread.Sleep(1000);
             }
-            
-            //File.WriteAllLines(@"E:\urls.txt", urls);
+
+            Console.ReadKey();
 
         }
     }
