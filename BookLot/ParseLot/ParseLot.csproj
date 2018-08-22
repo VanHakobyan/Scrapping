@@ -96,7 +96,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="bin\Debug\ParseLot.exe.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -105,18 +104,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="bin\Debug\geckodriver.exe" />
-    <Content Include="bin\Debug\HtmlAgilityPack.dll" />
-    <Content Include="bin\Debug\HtmlAgilityPack.pdb" />
-    <Resource Include="bin\Debug\HtmlAgilityPack.xml" />
-    <Content Include="bin\Debug\Newtonsoft.Json.dll" />
-    <Resource Include="bin\Debug\Newtonsoft.Json.xml" />
-    <Content Include="bin\Debug\ParseLot.exe" />
-    <Content Include="bin\Debug\ParseLot.pdb" />
-    <Content Include="bin\Debug\WebDriver.dll" />
-    <Resource Include="bin\Debug\WebDriver.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

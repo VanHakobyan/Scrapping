@@ -47,6 +47,7 @@ namespace ParseLot
                 try
                 {
                     await CreateModel();
+                    
                     try
                     {
                         var findElementByClassName = driver.ExecuteScript("return document.getElementsByClassName('flight_pagination__item slick-slide slick-active')") as IEnumerable<IWebElement>;
@@ -60,8 +61,8 @@ namespace ParseLot
                     try
                     {
                         var findElementByClassName1 = driver.ExecuteScript("return document.getElementsByClassName('flight_pagination__item slick-slide slick-active')") as IEnumerable<IWebElement>;
-                        findElementByClassName1.ElementAt(10).Click();
-                        await Task.Run(() => Thread.Sleep(11000));
+                        findElementByClassName1.ElementAt(11).Click();
+                        await Task.Run(() => Thread.Sleep(10));
                     }
                     catch (Exception)
                     {
@@ -104,6 +105,7 @@ namespace ParseLot
                     documentNest.LoadHtml(allTic[i].InnerHtml);
                     var start = starts[i].InnerText.Replace("\r", "").Replace("\t", "").Replace("\n", "").Replace("Origin,", "")
                         .Replace("Destination,", "").Trim();
+                  
                     var end = ends[i].InnerText.Replace("\r", "").Replace("\t", "").Replace("\n", "").Replace("Origin,", "")
                         .Replace("Destination,", "").Trim();
 
