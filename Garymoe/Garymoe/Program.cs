@@ -21,6 +21,7 @@ namespace Garymoe
             documentRoot.LoadHtml(dataRoot);
             int.TryParse(documentRoot.DocumentNode.SelectSingleNode(".//div[starts-with(@class,'page-div')]").FirstChild.InnerText.Split(' ')[3], out var count);
             var listUrls = new List<string>();
+
             for (int i = 0; i < count / 20 + 1; i++)
             {
                 try
