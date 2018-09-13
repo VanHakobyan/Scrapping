@@ -27,7 +27,7 @@ namespace Hellocoton
     {
         private const string Link = "http://www.hellocoton.fr/annuaire";
         private static string DebutantesLink = "https://www.hellocoton.fr/annuaire/debutantes/{}";
-        private static string GlobalLink = "https://www.hellocoton.fr/beaute";
+        private static string GlobalLink = "https://www.hellocoton.fr/annuaire/lifestyle";
         static void Main(string[] args)
         {
             var option = new ChromeOptions();
@@ -77,15 +77,16 @@ namespace Hellocoton
                     profile.WebsiteUrl = websiteUrl;
                     GetSocial(websiteUrl, profile);
                     categore.Profiles.Add(profile);
+                    Console.WriteLine(categore.Profiles.Count);
                 }
                 catch (Exception)
                 {
                 }
             }
 
-            categore.CategoreName = "beaute";
+            categore.CategoreName = "lifestyle";
             var json = JsonConvert.SerializeObject(categore);
-            File.WriteAllText(@"D:\beaute.json", json);
+            File.WriteAllText(@"D:\lifestyle.json", json);
             //NewMethod();
         }
 
