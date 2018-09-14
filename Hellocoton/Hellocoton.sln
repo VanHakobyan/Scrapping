@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28010.2019
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hellocoton", "Hellocoton\Hellocoton.csproj", "{96BECB4A-7926-468D-B275-140DD70B7F94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailLoading", "EmailLoading\EmailLoading.csproj", "{6793ADF0-0BA9-4AB4-AF32-803E9105D9F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{96BECB4A-7926-468D-B275-140DD70B7F94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96BECB4A-7926-468D-B275-140DD70B7F94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96BECB4A-7926-468D-B275-140DD70B7F94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6793ADF0-0BA9-4AB4-AF32-803E9105D9F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6793ADF0-0BA9-4AB4-AF32-803E9105D9F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6793ADF0-0BA9-4AB4-AF32-803E9105D9F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6793ADF0-0BA9-4AB4-AF32-803E9105D9F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
