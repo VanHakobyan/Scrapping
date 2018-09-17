@@ -8,7 +8,14 @@
         Title="MainWindow" Height="450" Width="800">
 
     <Grid>
-    <Button Name="Scrap" Content="Scrap" Click="Scrap_OnClick"></Button>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" ></RowDefinition>
+            <RowDefinition Height="Auto" ></RowDefinition>
+            <RowDefinition Height="Auto" ></RowDefinition>
+        </Grid.RowDefinitions>
+        <Button Grid.Row="0" Name="ScrapNBA" Content="ScrapNBA" Click="ScrapNBA_OnClick" Height="30" Margin="582,69,60,330"/>
+        <Button  Grid.Row="0" Name="ScrapCleaningtheglass" Content="ScrapCleaningtheglass" Click="ScrapCleaningtheglass_OnClick" Height="30"  Margin="321,69,321,330"></Button>
+        <Button Grid.Row="0" Name="ScrapBasketball" Content="ScrapBasketball" Click="ScrapBasketball_OnClick" Height="30" Margin="59,69,583,330"/>
 
     </Grid>
 </Window>

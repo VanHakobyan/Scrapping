@@ -7,8 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Html5;
 using OpenQA.Selenium.PhantomJS;
 using ScrappingHelpers.Models;
 
@@ -21,25 +19,44 @@ namespace ScrappingHelpers
         private const string BasketballUrl = "https://www.basketball-reference.com/leagues/NBA_2018.html#misc_stats::none";
         private PhantomJSDriver _driver;
 
-        public async Task<Resultset[]> GetNba()
+        public Resultset[] GetNba()
         {
-            //ChromeOptions options = new ChromeOptions();
-            //options.AddArguments("no-sandbox");
-            var phantomJsOptions = new PhantomJSOptions();
-            _driver = new PhantomJSDriver(phantomJsOptions);
-            
-            _driver.Navigate().GoToUrl(NbaUrl);
-            //WebClient client = new WebClient();
-            //client.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
-            //client.Headers.Add(HttpRequestHeader.Host, "stats.nba.com");
-            //client.Headers.Add(HttpRequestHeader.Accept, "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-            //client.Headers.Add(HttpRequestHeader.Cookie, "_ga=GA1.2.1855738158.1537100658; _gid=GA1.2.248724008.1537100658; ug=5b9e4b730bd1460a3f80c50015230761; ugs=1; check=true; s_cc=true; s_fid=4752F97492A5DF30-0E44F252D0FE76FD; s_sq=%5B%5BB%5D%5D; __gads=ID=251ef1f700689668:T=1537100661:S=ALNI_MYxIJY-B0G9Xm2lbqMAWUczGqVCyw; ak_bmsc=D992A79A1236A2C002530A8AEF4702CB0214846557690000764B9E5B68B81252~plux/4jmBFz/IezUWPaL4CAUerWwfzW266GjUO1dqKwEI2fXyGKiz+eXyRrUSkoCFQk1eHUNBvPyaxe+p7RC41H+J+ihLAYIIgBpixFplwMjpV2+rKSPgy3rg2PgX2Wlr5YdgBdzVc26720X/ijmOA9BuDS/g5Xyrj2fz+5VLBnlUYDfnZpFEAAE1gL0y2T5JP4I6xPuz0A5h5KBlAO5HzvKLUCl7ETbyETBo5iMpgELI=; s_vi=[CS]v1|2DCF25BB05031EBB-60001198C001333C[CE]; mbox=session#89613fc50ee6400cbdf16e3193331ada#1537102657|PC#89613fc50ee6400cbdf16e3193331ada.26_2#1600345461; bm_sv=C3220D3B876459291AA6DCCAC414413C~Tm4k8X9IefkaUzojmgOtXe/ZVmTN8022RNTGWpLojYviRGJRof1ruxxi421t9bSCKPIcTgZKNJva4GG6FuheASIqfqw9YUkFb8QAkMXmseF+qNEz/O8YHtxEBSl9Z5zMzokQiMXicm9+ogk3yqnMUQ==");
-            //var jsonData = await client.DownloadStringTaskAsync(NbaUrl);
+            try
+            {
+                //ChromeOptions options = new ChromeOptions();
+                //options.AddArguments("no-sandbox");
+                //var phantomJsOptions = new PhantomJSOptions();
+                _driver = new PhantomJSDriver();
 
-            var jsonData = _driver.PageSource;
-            var nbaModel = JsonConvert.DeserializeObject<NbaModel>(jsonData.Replace("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head></head><body><pre style=\"word-wrap: break-word; white-space: pre-wrap;\">","").Replace("</pre></body></html>", ""));
-            return nbaModel.resultSets;
-            
+                _driver.Navigate().GoToUrl(@"https://stats.nba.com/");
+                var cookieJar = _driver.Manage().Cookies;
+                WebClient client = new WebClient();
+                client.Headers.Add(HttpRequestHeader.UserAgent,
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
+                client.Headers.Add(HttpRequestHeader.Host, "stats.nba.com");
+                client.Headers.Add(HttpRequestHeader.Accept,
+                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+                client.Headers.Add(HttpRequestHeader.Cookie,
+                    $"_ga=GA1.2.1855738158.1537100658; ug=5b9e4b730bd1460a3f80c50015230761; check=true; s_cc=true; s_fid=4752F97492A5DF30-0E44F252D0FE76FD; s_sq=%5B%5BB%5D%5D; __gads=ID=251ef1f700689668:T=1537100661:S=ALNI_MYxIJY-B0G9Xm2lbqMAWUczGqVCyw; s_vi=[CS]v1|2DCF25BB05031EBB-60001198C001333C[CE]; _gid=GA1.2.2014030341.1537215695; ugs=1; ak_bmsc=75561C64DE8794A73A9348785F53F9EB0214846557690000D40CA05B3F216365~plY8nzTM5OusXgMfVU1kHZpM3EST1C/E0o74yCdwSULkDXMD/I31FIwAq6bmgCH5rWWrwXzqms6jw2irrNCe+bJdyDOdv0+wZuLa3vfMsz1lauBt73IfDM3911Ljvs9BYNyDBmJaZZPA336BBmQbwblZgL8dqxS+HfYxIpfYMZtj3QUbf+//ej7ygYydXsHMYwIPhHpqEZJfl+WcTFpvd8L+48ddYVOId3eeRHm0WTaSc=; bm_sv=7A4DFBD7B1B77AA2608375F7F0D9EDA4~Tm4k8X9IefkaUzojmgOtXUXszEDq+nwHMZnTbwckANlLE0sEq1OBCLNaEsRlT7IG7vN/GZXrhToR9Dh79oP9ixdkDnXzfHUlgcBsRk7mUIrUA9oI0Cqmwjitu6UOzUbjsPAQJRbZHmGNxNuaJG1nxw==; _gat=1; {cookieJar.GetCookieNamed("mbox")}");
+                var jsonData = client.DownloadString(NbaUrl);
+
+                //_driver.Navigate().GoToUrl(NbaUrl);
+                //var jsonData = _driver.PageSource;
+                var nbaModel = JsonConvert.DeserializeObject<NbaModel>(jsonData
+                    .Replace(
+                        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head></head><body><pre style=\"word-wrap: break-word; white-space: pre-wrap;\">",
+                        "").Replace("</pre></body></html>", ""));
+                return nbaModel.resultSets;
+
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            finally
+            {
+                _driver?.Quit();
+            }
         }
 
         public async Task<List<Cleaningtheglass>> GetCleaningtheglass()

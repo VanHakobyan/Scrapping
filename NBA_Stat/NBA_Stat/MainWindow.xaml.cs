@@ -27,12 +27,22 @@ namespace NBA_Stat
             InitializeComponent();
             _scrapping = new Scrapping();
         }
-
-        private async void Scrap_OnClick(object sender, RoutedEventArgs e)
+        
+        private  void ScrapNBA_OnClick(object sender, RoutedEventArgs e)
         {
-            //var resultBasketball = await _scrapping.GetBasketball();
-            //var leaningtheglass = await _scrapping.GetCleaningtheglass();
-            var nba =await _scrapping.GetNba();
+            var nba =  _scrapping.GetNba();
+        }
+
+        private async void ScrapCleaningtheglass_OnClick(object sender, RoutedEventArgs e)
+        {
+
+            var leaningtheglass = await _scrapping.GetCleaningtheglass();
+        }
+
+        private async void ScrapBasketball_OnClick(object sender, RoutedEventArgs e)
+        {
+
+            var resultBasketball = await _scrapping.GetBasketball();
         }
     }
 }
