@@ -30,7 +30,7 @@ namespace ScrappingHelpers
             return nbaModel.resultSets;
         }
 
-        public async Task<Resultset[]> GetCleaningtheglass()
+        public async Task<List<Cleaningtheglass>> GetCleaningtheglass()
         {
             WebClient client = new WebClient();
             client.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
@@ -39,18 +39,46 @@ namespace ScrappingHelpers
             document.LoadHtml(htmlData);
             var tabele = document.DocumentNode.SelectSingleNode(".//div[@class='stat_table_container']");
             var rows = tabele.SelectSingleNode(".//tbody").SelectNodes(".//tr");
-            var cleaningthegs=new List<Cleaningtheglass>();
+            var cleaningthegs = new List<Cleaningtheglass>();
             foreach (var row in rows)
             {
-                var col = row.InnerText.Split(new []{"\n"," "},StringSplitOptions.RemoveEmptyEntries);
-                var item =new Cleaningtheglass
+                var col = row.InnerText.Split(new[] { "\n", " " }, StringSplitOptions.RemoveEmptyEntries);
+                var item = new Cleaningtheglass
                 {
-                   //todo:implemet items
+                    Team = col[0],
+                    Diff_rank = col[1],
+                    Diff_value = col[2],
+                    ExpW82 = col[3],
+                    ExpW = col[4],
+                    Win = col[5],
+                    WinDiff = col[6],
+                    W = col[7],
+                    L = col[8],
+                    Offense_Pts_Poss_rank = col[9],
+                    Offense_Pts_Poss_value = col[10],
+                    Offense_eFGProcent_rank = col[11],
+                    Offense_eFGProcent_value = col[12],
+                    Offense_TovProcent_rank = col[13],
+                    Offense_TovProcent_value = col[14],
+                    Offense_ORBProcent_rank = col[15],
+                    Offense_ORBProcent_value = col[16],
+                    Offense_FTRate_rank = col[17],
+                    Offense_FTRate_value = col[18],
+                    Defense_Pts_Poss_rank = col[19],
+                    Defense_Pts_Poss_value = col[20],
+                    Defense_eFGProcent_rank = col[21],
+                    Defense_eFGProcent_value = col[22],
+                    Defense_TovProcent_rank = col[23],
+                    Defense_TovProcent_value = col[24],
+                    Defense_ORBProcent_rank = col[25],
+                    Defense_ORBProcent_value = col[26],
+                    Defense_FTRate_rank = col[27],
+                    Defense_FTRate_value = col[28]
                 };
                 cleaningthegs.Add(item);
             }
 
-            return null;
+            return cleaningthegs;
         }
 
 
