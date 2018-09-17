@@ -7,6 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Html5;
+using OpenQA.Selenium.PhantomJS;
 using ScrappingHelpers.Models;
 
 namespace ScrappingHelpers
@@ -16,18 +19,27 @@ namespace ScrappingHelpers
         private const string NbaUrl = "https://stats.nba.com/stats/leaguedashteamstats?Conference=&DateFrom=&DateTo=&Division=&GameScope=&GameSegment=&LastNGames=0&LeagueID=00&Location=&MeasureType=Advanced&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season=2017-18&SeasonSegment=&SeasonType=Regular+Season&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=";
         private const string CleaningtheglassUrl = "https://www.cleaningtheglass.com/stats/league/fourfactors";
         private const string BasketballUrl = "https://www.basketball-reference.com/leagues/NBA_2018.html#misc_stats::none";
+        private PhantomJSDriver _driver;
 
         public async Task<Resultset[]> GetNba()
         {
-            WebClient client = new WebClient();
-            client.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
-            client.Headers.Add(HttpRequestHeader.Host, "stats.nba.com");
-            client.Headers.Add(HttpRequestHeader.Accept, "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-            client.Headers.Add(HttpRequestHeader.Cookie, "_ga=GA1.2.1855738158.1537100658; _gid=GA1.2.248724008.1537100658; ug=5b9e4b730bd1460a3f80c50015230761; ugs=1; check=true; s_cc=true; s_fid=4752F97492A5DF30-0E44F252D0FE76FD; s_sq=%5B%5BB%5D%5D; __gads=ID=251ef1f700689668:T=1537100661:S=ALNI_MYxIJY-B0G9Xm2lbqMAWUczGqVCyw; ak_bmsc=D992A79A1236A2C002530A8AEF4702CB0214846557690000764B9E5B68B81252~plux/4jmBFz/IezUWPaL4CAUerWwfzW266GjUO1dqKwEI2fXyGKiz+eXyRrUSkoCFQk1eHUNBvPyaxe+p7RC41H+J+ihLAYIIgBpixFplwMjpV2+rKSPgy3rg2PgX2Wlr5YdgBdzVc26720X/ijmOA9BuDS/g5Xyrj2fz+5VLBnlUYDfnZpFEAAE1gL0y2T5JP4I6xPuz0A5h5KBlAO5HzvKLUCl7ETbyETBo5iMpgELI=; s_vi=[CS]v1|2DCF25BB05031EBB-60001198C001333C[CE]; mbox=session#89613fc50ee6400cbdf16e3193331ada#1537102657|PC#89613fc50ee6400cbdf16e3193331ada.26_2#1600345461; bm_sv=C3220D3B876459291AA6DCCAC414413C~Tm4k8X9IefkaUzojmgOtXe/ZVmTN8022RNTGWpLojYviRGJRof1ruxxi421t9bSCKPIcTgZKNJva4GG6FuheASIqfqw9YUkFb8QAkMXmseF+qNEz/O8YHtxEBSl9Z5zMzokQiMXicm9+ogk3yqnMUQ==");
+            //ChromeOptions options = new ChromeOptions();
+            //options.AddArguments("no-sandbox");
+            var phantomJsOptions = new PhantomJSOptions();
+            _driver = new PhantomJSDriver(phantomJsOptions);
+            
+            _driver.Navigate().GoToUrl(NbaUrl);
+            //WebClient client = new WebClient();
+            //client.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
+            //client.Headers.Add(HttpRequestHeader.Host, "stats.nba.com");
+            //client.Headers.Add(HttpRequestHeader.Accept, "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            //client.Headers.Add(HttpRequestHeader.Cookie, "_ga=GA1.2.1855738158.1537100658; _gid=GA1.2.248724008.1537100658; ug=5b9e4b730bd1460a3f80c50015230761; ugs=1; check=true; s_cc=true; s_fid=4752F97492A5DF30-0E44F252D0FE76FD; s_sq=%5B%5BB%5D%5D; __gads=ID=251ef1f700689668:T=1537100661:S=ALNI_MYxIJY-B0G9Xm2lbqMAWUczGqVCyw; ak_bmsc=D992A79A1236A2C002530A8AEF4702CB0214846557690000764B9E5B68B81252~plux/4jmBFz/IezUWPaL4CAUerWwfzW266GjUO1dqKwEI2fXyGKiz+eXyRrUSkoCFQk1eHUNBvPyaxe+p7RC41H+J+ihLAYIIgBpixFplwMjpV2+rKSPgy3rg2PgX2Wlr5YdgBdzVc26720X/ijmOA9BuDS/g5Xyrj2fz+5VLBnlUYDfnZpFEAAE1gL0y2T5JP4I6xPuz0A5h5KBlAO5HzvKLUCl7ETbyETBo5iMpgELI=; s_vi=[CS]v1|2DCF25BB05031EBB-60001198C001333C[CE]; mbox=session#89613fc50ee6400cbdf16e3193331ada#1537102657|PC#89613fc50ee6400cbdf16e3193331ada.26_2#1600345461; bm_sv=C3220D3B876459291AA6DCCAC414413C~Tm4k8X9IefkaUzojmgOtXe/ZVmTN8022RNTGWpLojYviRGJRof1ruxxi421t9bSCKPIcTgZKNJva4GG6FuheASIqfqw9YUkFb8QAkMXmseF+qNEz/O8YHtxEBSl9Z5zMzokQiMXicm9+ogk3yqnMUQ==");
             //var jsonData = await client.DownloadStringTaskAsync(NbaUrl);
-            var jsonData = await client.DownloadStringTaskAsync(NbaUrl);
-            var nbaModel = JsonConvert.DeserializeObject<NbaModel>(jsonData);
+
+            var jsonData = _driver.PageSource;
+            var nbaModel = JsonConvert.DeserializeObject<NbaModel>(jsonData.Replace("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head></head><body><pre style=\"word-wrap: break-word; white-space: pre-wrap;\">","").Replace("</pre></body></html>", ""));
             return nbaModel.resultSets;
+            
         }
 
         public async Task<List<Cleaningtheglass>> GetCleaningtheglass()

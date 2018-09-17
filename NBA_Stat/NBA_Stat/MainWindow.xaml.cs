@@ -30,8 +30,8 @@ namespace NBA_Stat
 
         private async void Scrap_OnClick(object sender, RoutedEventArgs e)
         {
-            var resultBasketball = await _scrapping.GetBasketball();
-            var leaningtheglass = await _scrapping.GetCleaningtheglass();
+            //var resultBasketball = await _scrapping.GetBasketball();
+            //var leaningtheglass = await _scrapping.GetCleaningtheglass();
             var nba =await _scrapping.GetNba();
         }
     }
