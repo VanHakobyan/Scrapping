@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Models\Basketball.cs" />
     <Compile Include="Models\Cleaningtheglass.cs" />
+    <Compile Include="Models\NBAFactory.cs" />
     <Compile Include="Models\NbaModel.cs" />
     <Compile Include="Scrapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

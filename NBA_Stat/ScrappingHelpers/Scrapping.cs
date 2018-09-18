@@ -7,7 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.PhantomJS;
+using OpenQA.Selenium.Remote;
 using ScrappingHelpers.Models;
 
 namespace ScrappingHelpers
@@ -18,35 +21,88 @@ namespace ScrappingHelpers
         private const string CleaningtheglassUrl = "https://www.cleaningtheglass.com/stats/league/fourfactors";
         private const string BasketballUrl = "https://www.basketball-reference.com/leagues/NBA_2018.html#misc_stats::none";
         private PhantomJSDriver _driver;
+        private ChromeDriver _chromeDriver;
 
-        public Resultset[] GetNba()
+        public List<NBAFactory> GetNba()
         {
             try
             {
-                //ChromeOptions options = new ChromeOptions();
+                ChromeOptions options = new ChromeOptions();
                 //options.AddArguments("no-sandbox");
-                //var phantomJsOptions = new PhantomJSOptions();
-                _driver = new PhantomJSDriver();
+                //options.AddArguments("--headless");
+                _chromeDriver = new ChromeDriver(options);
+                _chromeDriver.Navigate().GoToUrl(NbaUrl);
 
-                _driver.Navigate().GoToUrl(@"https://stats.nba.com/");
-                var cookieJar = _driver.Manage().Cookies;
-                WebClient client = new WebClient();
-                client.Headers.Add(HttpRequestHeader.UserAgent,
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
-                client.Headers.Add(HttpRequestHeader.Host, "stats.nba.com");
-                client.Headers.Add(HttpRequestHeader.Accept,
-                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-                client.Headers.Add(HttpRequestHeader.Cookie,
-                    $"_ga=GA1.2.1855738158.1537100658; ug=5b9e4b730bd1460a3f80c50015230761; check=true; s_cc=true; s_fid=4752F97492A5DF30-0E44F252D0FE76FD; s_sq=%5B%5BB%5D%5D; __gads=ID=251ef1f700689668:T=1537100661:S=ALNI_MYxIJY-B0G9Xm2lbqMAWUczGqVCyw; s_vi=[CS]v1|2DCF25BB05031EBB-60001198C001333C[CE]; _gid=GA1.2.2014030341.1537215695; ugs=1; ak_bmsc=75561C64DE8794A73A9348785F53F9EB0214846557690000D40CA05B3F216365~plY8nzTM5OusXgMfVU1kHZpM3EST1C/E0o74yCdwSULkDXMD/I31FIwAq6bmgCH5rWWrwXzqms6jw2irrNCe+bJdyDOdv0+wZuLa3vfMsz1lauBt73IfDM3911Ljvs9BYNyDBmJaZZPA336BBmQbwblZgL8dqxS+HfYxIpfYMZtj3QUbf+//ej7ygYydXsHMYwIPhHpqEZJfl+WcTFpvd8L+48ddYVOId3eeRHm0WTaSc=; bm_sv=7A4DFBD7B1B77AA2608375F7F0D9EDA4~Tm4k8X9IefkaUzojmgOtXUXszEDq+nwHMZnTbwckANlLE0sEq1OBCLNaEsRlT7IG7vN/GZXrhToR9Dh79oP9ixdkDnXzfHUlgcBsRk7mUIrUA9oI0Cqmwjitu6UOzUbjsPAQJRbZHmGNxNuaJG1nxw==; _gat=1; {cookieJar.GetCookieNamed("mbox")}");
-                var jsonData = client.DownloadString(NbaUrl);
 
-                //_driver.Navigate().GoToUrl(NbaUrl);
-                //var jsonData = _driver.PageSource;
+                //WebClient client = new WebClient();
+                //client.Headers.Add(HttpRequestHeader.UserAgent,
+                //    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
+                //client.Headers.Add(HttpRequestHeader.Host, "stats.nba.com");
+                //client.Headers.Add(HttpRequestHeader.Accept,
+                //    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+                //client.Headers.Add(HttpRequestHeader.Cookie,
+                //$"{cookieJar.GetCookieNamed("_ga")}; {cookieJar.GetCookieNamed("ug")} ;check=true; s_cc=true; s_fid=4752F97492A5DF30-0E44F252D0FE76FD;{cookieJar.GetCookieNamed("s_sq")}__gads=ID=251ef1f700689668:T=1537100661:S=ALNI_MYxIJY-B0G9Xm2lbqMAWUczGqVCyw; s_vi=[CS]v1|2DCF25BB05031EBB-60001198C001333C[CE]; {cookieJar.GetCookieNamed("_gid")}; ugs=1; ads=ID=4fd23ebe8f320268:T=1537189166:S=ALNI_MY53ngmtln7hli682R46WOv-irTrQ; s_vi=[CS]v1|2DCFD29785030596-40001198C0001155[CE]; _gat=1; _gat=1; {cookieJar.GetCookieNamed("mbox")}");
+                //client.Headers.Add(HttpRequestHeader.Cookie, $"_ga=GA1.2.1476500595.1537189165; _gid=GA1.2.7857329hnfhfg21.1537189165; ug=5b9fa52d059ee60a3f984b00125c21f1; ugs=1; check=true; s_cc=true; s_fid=24650818396EAA92-09886E3EE71714BE; s_sq=%5B%5BB%5D%5D; __gads=ID=4fd23ebe8f320268:T=1537189166:S=ALNI_MY53ngmtln7hli682R46WOv-irTrQ; s_vi=[CS]v1|2DCFD29785030596-40001198C0001155[CE];ak_bmsc=ED989E0150A303EA8EB5D6B8E21451BD173ADF4C8B6F00003FC2A05B6AB3DE25~plbjQbnWsmd3Sk14Xx9ctymCQi7I3qIzf4uM+7/pJtm4nw6Ozgzfgz1pkwnfnnEtfq67amcZsVIp68UaGBZr9eSkRaIspocIQhskXhIGHrPdOnc7KMSvrMik6gBWQRBYBFoiy7sj9TU4CZZ0OnGJu9zpRLSHJd2Oc207ze0pRCLz+udjLGED7lUKZualn9l5copOsG/nCUFYOpAQFPH8Mm7OtZXWSxu69cdeb3AYfJLaI=; _gat=1;mbox=PC#9dfe128d64994a678f941302f459d68e.26_2#1600499329|session#b2743753531642b286afad0bb5ca2742#1537256389");
+                //client.Headers.Add(HttpRequestHeader.Cookie,$"_ga=GA1.2.1476500595.1537189165; _gid=GA1.2.785732921.1537189165; ug=5b9fa52d059ee60a3f984b00125c21f1; ugs=1; check=true; s_cc=true; s_fid=24650818396EAA92-09886E3EE71714BE; s_sq=%5B%5BB%5D%5D; __gads=ID=4fd23ebe8f320268:T=1537189166:S=ALNI_MY53ngmtln7hli682R46WOv-irTrQ; s_vi=[CS]v1|2DCFD29785030596-40001198C0001155[CE]; mbox=PC#9dfe128d64994a678f941302f459d68e.26_2#1600499329|session#b2743753531642b286afad0bb5ca2742#1537256389; ak_bmsc=ED989E0150A303EA8EB5D6B8E21451BD173ADF4C8B6F00003FC2A05B6AB3DE25~plbjQbnWsmd3Sk14Xx9ctymCQi7I3qIzf4uM+7/pJtm4nw6Ozgzfgz1pkwnfnnEtfq67amcZsVIp68UaGBZr9eSkRaIspocIQhskXhIGHrPdOnc7KMSvrMik6gBWQRBYBFoiy7sj9TU4CZZ0OnGJu9zpRLSHJd2Oc207ze0pRCLz+udjLGED7lUKZualn9l5copOsG/nCUFYOpAQFPH8Mm7OtZXWSxu69cdeb3AYfJLaI=; bm_sv=69B3D72A775B96BE61BFC7ACB02344A1~v/KZyNn0RCydppnc7RhtV1p0+YG8jHyCBxF3pWqJSIQXGoQ3p5JT7mcoqQsviJ2rrTAS3wvEr4XRbw7d+uPBF7Iy3ckIKPSXhBkF8j1QZ5ZWziGhTUns8N/mI45/5GCfggLN2DvKtbGhKRKQGj5i4g==");
+                //var jsonData = client.DownloadString("https://stats.nba.com/teams/advanced/?sort=W&dir=-1");
+
+                var jsonData = _chromeDriver.PageSource;
                 var nbaModel = JsonConvert.DeserializeObject<NbaModel>(jsonData
                     .Replace(
                         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head></head><body><pre style=\"word-wrap: break-word; white-space: pre-wrap;\">",
                         "").Replace("</pre></body></html>", ""));
-                return nbaModel.resultSets;
+                var nbas=new List<NBAFactory>();
+                for (int i = 0; i < nbaModel.resultSets[0].rowSet.Length; i++)
+                {
+                    var k = 0;
+                    var nba=new NBAFactory
+                    {
+                        TEAM_ID = nbaModel.resultSets[0].rowSet[i][k++],
+                        TEAM_NAME      =nbaModel.resultSets[0].rowSet[i][k++],
+                        GP             =nbaModel.resultSets[0].rowSet[i][k++],
+                        W              =nbaModel.resultSets[0].rowSet[i][k++],
+                        L              =nbaModel.resultSets[0].rowSet[i][k++],
+                        W_PCT          =nbaModel.resultSets[0].rowSet[i][k++],
+                        MIN            =nbaModel.resultSets[0].rowSet[i][k++],
+                        OFF_RATING     =nbaModel.resultSets[0].rowSet[i][k++],
+                        DEF_RATING     =nbaModel.resultSets[0].rowSet[i][k++],
+                        NET_RATING     =nbaModel.resultSets[0].rowSet[i][k++],
+                        AST_PCT        =nbaModel.resultSets[0].rowSet[i][k++],
+                        AST_TO         =nbaModel.resultSets[0].rowSet[i][k++],
+                        AST_RATIO      =nbaModel.resultSets[0].rowSet[i][k++],
+                        OREB_PCT       =nbaModel.resultSets[0].rowSet[i][k++],
+                        DREB_PCT       =nbaModel.resultSets[0].rowSet[i][k++],
+                        REB_PCT        =nbaModel.resultSets[0].rowSet[i][k++],
+                        TM_TOV_PCT     =nbaModel.resultSets[0].rowSet[i][k++],
+                        EFG_PCT        =nbaModel.resultSets[0].rowSet[i][k++],
+                        TS_PCT         =nbaModel.resultSets[0].rowSet[i][k++],
+                        PACE           =nbaModel.resultSets[0].rowSet[i][k++],
+                        PIE            =nbaModel.resultSets[0].rowSet[i][k++],
+                        GP_RANK        =nbaModel.resultSets[0].rowSet[i][k++],
+                        W_RANK         =nbaModel.resultSets[0].rowSet[i][k++],
+                        L_RANK         =nbaModel.resultSets[0].rowSet[i][k++],
+                        W_PCT_RANK     =nbaModel.resultSets[0].rowSet[i][k++],
+                        MIN_RANK       =nbaModel.resultSets[0].rowSet[i][k++],
+                        OFF_RATING_RANK=nbaModel.resultSets[0].rowSet[i][k++],
+                        DEF_RATING_RANK=nbaModel.resultSets[0].rowSet[i][k++],
+                        NET_RATING_RANK=nbaModel.resultSets[0].rowSet[i][k++],
+                        AST_PCT_RANK   =nbaModel.resultSets[0].rowSet[i][k++],
+                        AST_TO_RANK    =nbaModel.resultSets[0].rowSet[i][k++],
+                        AST_RATIO_RANK =nbaModel.resultSets[0].rowSet[i][k++],
+                        OREB_PCT_RANK  =nbaModel.resultSets[0].rowSet[i][k++],
+                        DREB_PCT_RANK  =nbaModel.resultSets[0].rowSet[i][k++],
+                        REB_PCT_RANK   =nbaModel.resultSets[0].rowSet[i][k++],
+                        TM_TOV_PCT_RANK=nbaModel.resultSets[0].rowSet[i][k++],
+                        EFG_PCT_RANK   =nbaModel.resultSets[0].rowSet[i][k++],
+                        TS_PCT_RANK    =nbaModel.resultSets[0].rowSet[i][k++],
+                        PACE_RANK      =nbaModel.resultSets[0].rowSet[i][k++],
+                        PIE_RANK       =nbaModel.resultSets[0].rowSet[i][k++],
+                        CFID           =nbaModel.resultSets[0].rowSet[i][k++],
+                        CFPARAMS       =nbaModel.resultSets[0].rowSet[i][k]
+                    };
+                   nbas.Add(nba);
+                }
+                return nbas;
 
             }
             catch (Exception e)
@@ -55,6 +111,8 @@ namespace ScrappingHelpers
             }
             finally
             {
+                _chromeDriver?.Close();
+                _chromeDriver?.Quit();
                 _driver?.Quit();
             }
         }

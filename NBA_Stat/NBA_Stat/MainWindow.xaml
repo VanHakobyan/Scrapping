@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NBA_Stat"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Scrapper" Height="450" Width="800"
+        ResizeMode="CanMinimize"
+        >
 
     <Grid>
         <Grid.RowDefinitions>
@@ -13,9 +15,11 @@
             <RowDefinition Height="Auto" ></RowDefinition>
             <RowDefinition Height="Auto" ></RowDefinition>
         </Grid.RowDefinitions>
-        <Button Grid.Row="0" Name="ScrapNBA" Content="ScrapNBA" Click="ScrapNBA_OnClick" Height="30" Margin="582,69,60,330"/>
-        <Button  Grid.Row="0" Name="ScrapCleaningtheglass" Content="ScrapCleaningtheglass" Click="ScrapCleaningtheglass_OnClick" Height="30"  Margin="321,69,321,330"></Button>
-        <Button Grid.Row="0" Name="ScrapBasketball" Content="ScrapBasketball" Click="ScrapBasketball_OnClick" Height="30" Margin="59,69,583,330"/>
+        <Label Content="Path to save" Grid.Row="0" Margin="149,30,551,21"/>
+        <TextBox Name="Path" Grid.Row="0" Margin="271,30,297,21"/>
+        <Button Grid.Row="1" Name="ScrapNBA" Content="ScrapNBA" Click="ScrapNBA_OnClick" Height="30" Margin="582,69,60,330"/>
+        <Button  Grid.Row="1" Name="ScrapCleaningtheglass" Content="ScrapCleaningtheglass" Click="ScrapCleaningtheglass_OnClick" Height="30"  Margin="321,69,321,330"></Button>
+        <Button Grid.Row="1" Name="ScrapBasketball" Content="ScrapBasketball" Click="ScrapBasketball_OnClick" Height="30" Margin="59,69,583,330"/>
 
     </Grid>
 </Window>
