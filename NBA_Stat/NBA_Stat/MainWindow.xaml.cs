@@ -62,7 +62,7 @@ namespace NBA_Stat
                 WriteCSV(nba, saved);
                 MessageBox.Show($"Completed and svaed to {saved} ");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 MessageBox.Show("Error");
             }
