@@ -36,17 +36,17 @@ namespace Hecalumni
             ChromeDriver chromeDriver = new ChromeDriver();
             chromeDriver.Navigate().GoToUrl(Url);
             Thread.Sleep(5000);
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 80; i++)
             {
                 try
                 {
                     chromeDriver.ExecuteScript($"window.scrollBy(0,1750);");
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
 
                 }
-                Thread.Sleep(1000);
+                Thread.Sleep(2000);
             }
             var models = new List<Model>();
             HtmlDocument document = new HtmlDocument();
@@ -57,17 +57,40 @@ namespace Hecalumni
                 try
                 {
                     chromeDriver.Navigate().GoToUrl($"https://www.hecalumni.fr{link}");
-                    Thread.Sleep(2000);
+                    Thread.Sleep(1300);
                     var doc = new HtmlDocument();
                     doc.LoadHtml(chromeDriver.PageSource);
                     var model = new Model();
-                    model.FirstName = link.Split('/')[2].Split('-')?.First();
-                    model.LastName = link.Split('/')[2].Split('-')?.Last();
-                    chromeDriver.FindElementByXPath(".//a[@id='link-addresses']")?.Click();
+                    var s = link.Split('/')[2];
+                    var arr = s.Split('-');
+                    var fn = string.Empty;
+                    var ln = string.Empty;
+                    fn = arr[0];
+                    if (arr.Length == 2)
+                    {
+                        ln = arr[1];
+                    }
+                    else
+                    {
+                        ln = string.Join(" ", arr.Skip(1));
+                    }
+
+                    model.FirstName = fn;
+                    model.LastName = ln;
+                    //try
+                    //{
+                    //    chromeDriver.FindElementByXPath(".//a[@id='link-addresses']")?.Click();
+                    //    Thread.Sleep(1000);
+                    //}
+                    //catch (Exception e)
+                    //{
+
+                    //}
                     var profileDiv = doc.DocumentNode.SelectSingleNode(".//div[@class='row-fluid profile-user-job']");
-                    var job = profileDiv.SelectSingleNode(".//div[@class='span12 bigger']")?.InnerText?.Trim().Replace("\r", "")?.Replace("\t", "")?.Replace("\n", "");
-                    var city = profileDiv.SelectNodes(".//div[@class='row-fluid no-min-height pull-up-mini']").First()?.SelectSingleNode(".//a")?.InnerText?.Split(',')?.First().Trim().Replace("\r", "")?.Replace("\t", "")?.Replace("\n", "");
-                    var mail = profileDiv.SelectNodes(".//div[@class='row-fluid no-min-height pull-up-mini']")?.Last()?.InnerText?.Trim()?.Replace("\r", "")?.Replace("\t", "")?.Replace("\n", "");
+                    var mail = doc.DocumentNode.SelectSingleNode(".//div[@class='row-fluid no-min-height user-profil-email-1']")?.SelectSingleNode(".//a")?.InnerText?.Trim()?.Replace("\r", "")?.Replace("\t", "")?.Replace("\n", "");
+                    var job = profileDiv.SelectSingleNode(".//div[@class='row-fluid']")?.InnerText?.Trim().Replace("\r", "")?.Replace("\t", "")?.Replace("\n", "");
+                    var city = profileDiv.SelectNodes(".//div[@class='row-fluid no-min-height pull-up-mini']").FirstOrDefault(x => x.OuterHtml.Contains("Masquer les coordonnées"))?.SelectSingleNode(".//div[@class='span12']").ChildNodes.Where(x => x.Name == "#text").ElementAt(1).InnerText?.Trim().Replace("\r", "")?.Replace("\t", "")?.Replace("\n", "");
+                    //var mail = profileDiv.SelectNodes(".//div[@class='row-fluid no-min-height pull-up-mini']")?.Last()?.InnerText?.Trim()?.Replace("\r", "")?.Replace("\t", "")?.Replace("\n", "");
                     model.City = city;
                     model.Email = mail;
                     model.Job = job;
@@ -79,8 +102,16 @@ namespace Hecalumni
                 }
             }
 
-            WriteCSV(models,"D:\\HEC.csv");
-            WriteCSV(listOfLink,"D:\\HECLink.csv");
+            foreach (var model in models)
+            {
+                model.FirstName = model.FirstName?.Replace(",", ".");
+                model.LastName = model.LastName?.Replace(",", ".");
+                model.Job = model.Job?.Replace(",", ".");
+                model.City = model.City?.Replace(",", ".");
+                model.Email = model.Email?.Replace(",", ".");
+            }
+            WriteCSV(models, "E:\\HEC1.csv");
+            //File.WriteAllLines("E:\\HECLink.txt", listOfLink);
 
         }
     }
