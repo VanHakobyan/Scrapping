@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using NLog;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.IE;
+using OpenQA.Selenium.Remote;
 
 namespace Universal.Scrapper
 {
@@ -13,7 +15,7 @@ namespace Universal.Scrapper
     class Program
     {
 
-        public static void Login(IConfigurationRoot builder, ChromeDriver driver)
+        public static void Login(IConfigurationRoot builder, RemoteWebDriver driver)
         {
             var credential = builder.GetSection("Credentials").GetChildren().Select(x => x.Value).ToList();
             var _email = credential[0];
@@ -44,8 +46,9 @@ namespace Universal.Scrapper
             option.AddArguments("--headless");
             option.AddUserProfilePreference("profile.default_content_setting_values.images", 2);
             option.AddUserProfilePreference("profile.default_content_setting_values.stylesheet", 2);
+            var proxy = new Proxy { HttpProxy = builder.GetValue<string>("Proxy") };
+            option.Proxy = proxy;
             var driver = new ChromeDriver(Directory.GetCurrentDirectory(), option);
-
             if(builder.GetValue<bool>("IsLogin")) Login(builder,driver);
 
             foreach (var url in urls)
