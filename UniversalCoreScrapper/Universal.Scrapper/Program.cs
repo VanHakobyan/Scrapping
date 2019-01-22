@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -41,6 +42,14 @@ namespace Universal.Scrapper
                 .Build();
 
             var urls = builder.GetSection("Urls").GetChildren().Select(x => x.Value).ToList();
+            if (builder.GetValue<bool>("IsSelenium"))
+                GetWithSelenum(builder, urls, logger);
+            else
+                Helper.SendGetRequest(urls, string.Empty, string.Empty);
+        }
+
+        private static void GetWithSelenum(IConfigurationRoot builder, List<string> urls, Logger logger)
+        {
             var option = new ChromeOptions();
             option.AddArgument("--start-maximized");
             option.AddArguments("--headless");
@@ -49,7 +58,8 @@ namespace Universal.Scrapper
             var proxy = new Proxy { HttpProxy = builder.GetValue<string>("Proxy") };
             option.Proxy = proxy;
             var driver = new ChromeDriver(Directory.GetCurrentDirectory(), option);
-            if(builder.GetValue<bool>("IsLogin")) Login(builder,driver);
+
+            if (builder.GetValue<bool>("IsLogin")) Login(builder, driver);
 
             foreach (var url in urls)
             {
