@@ -40,22 +40,27 @@ namespace Universal.Scrapper
                 .SetBasePath(directoryInfo)
                 .AddJsonFile("appsettings.json", true, true)
                 .Build();
-
-            var urls = builder.GetSection("Urls").GetChildren().Select(x => x.Value).ToList();
-            if (builder.GetValue<bool>("IsSelenium"))
-                GetWithSelenum(builder, urls, logger);
+            var proxy = builder.GetValue<string>("Proxy");
+            var urls = builder.GetSection("Urls").AsEnumerable().Select(x => x.Value).Where(x => x != null).ToList();
+            if (builder.GetValue<bool>("IsSelenium")) GetWithSelenum(builder, urls, logger, proxy);
             else
-                Helper.SendGetRequest(urls, string.Empty, string.Empty);
+            {
+                foreach (var url in urls)
+                {
+                    var res = Helper.SendGetRequest(url, proxy.Split(':')[0], proxy.Split(':')[1]).GetAwaiter().GetResult();
+                    logger.Info(res);
+                }
+            }
         }
 
-        private static void GetWithSelenum(IConfigurationRoot builder, List<string> urls, Logger logger)
+        private static void GetWithSelenum(IConfigurationRoot builder, List<string> urls, Logger logger, string ipProxy)
         {
             var option = new ChromeOptions();
             option.AddArgument("--start-maximized");
             option.AddArguments("--headless");
             option.AddUserProfilePreference("profile.default_content_setting_values.images", 2);
             option.AddUserProfilePreference("profile.default_content_setting_values.stylesheet", 2);
-            var proxy = new Proxy { HttpProxy = builder.GetValue<string>("Proxy") };
+            var proxy = new Proxy { HttpProxy = ipProxy };
             option.Proxy = proxy;
             var driver = new ChromeDriver(Directory.GetCurrentDirectory(), option);
 
