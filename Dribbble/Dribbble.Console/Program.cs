@@ -12,7 +12,7 @@ namespace Dribbble.Console
         static void Main(string[] args)
         {
             var scrapper = new Scrapper();
-            var profileContent = scrapper.GetProfileContent().GetAwaiter().GetResult();
+            scrapper.GetProfiles().GetAwaiter().GetResult();
         }
     }
 }
