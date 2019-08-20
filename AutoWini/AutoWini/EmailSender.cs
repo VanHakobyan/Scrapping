@@ -18,7 +18,7 @@ namespace AutoWini
             using (var msg = new MailMessage())
             {
 
-                msg.To.Add("vanhakobyan1996@gmail.com");
+                msg.To.Add("petrosmu24@gmail.com");
                 msg.From = new MailAddress("ISTCCsharp@gmail.com");
 
                 msg.Subject = "Autowini have New Kia K5";

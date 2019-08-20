@@ -19,7 +19,7 @@ namespace AutoWini
 
         public void GetAndAnalyzeData()
         {
-            EmailSender.SendEmail(new CarModel(){Name = "Test",Price = 0});
+            //EmailSender.SendEmail(new CarModel(){Name = "Test",Price = 0});
             while (true)
             {
                 HttpClient client = new HttpClient();
@@ -32,7 +32,7 @@ namespace AutoWini
                 foreach (var auto in autoCollection)
                 {
                     var autoInfo = auto.SelectSingleNode(".//div[@class='stockInfo']");
-                    if (autoInfo != null && !autoInfo.InnerText.ToLower().Contains("taxi") && auto.InnerText.Contains("http://image.autowini.com/IMG/renew/common/icon_new.png"))
+                    if (autoInfo != null && !autoInfo.InnerText.ToLower().Contains("taxi") && auto.InnerHtml.Contains("image.autowini.com/resources/IMG/renew/common/icon/icon_new.png"))
                     {
                         var autoPrice = auto.SelectSingleNode(".//div[@class='stockPrice']").InnerText.ToLower().Replace("usd", "").Replace(",", "").Trim();
                         var price = int.Parse(autoPrice);
