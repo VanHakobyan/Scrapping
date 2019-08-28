@@ -22,11 +22,12 @@ namespace Skema.edu
 
         private static void GetProfile()
         {
-            List<Model> models=new List<Model>();
+            List<Model> models = new List<Model>();
             var text = File.ReadAllText((@"E:\kamil.json"));
             var links = JsonConvert.DeserializeObject<List<string>>(text);
             links = links.Select(x => x.Insert(0, "https://alumni.skema.edu/fr")).ToList();
             ChromeDriver chromeDriver = new ChromeDriver();
+            links = links.Skip(200).ToList();
             foreach (var link in links)
             {
                 chromeDriver.Navigate().GoToUrl(link);
@@ -34,7 +35,7 @@ namespace Skema.edu
 
                 HtmlDocument document = new HtmlDocument();
                 document.LoadHtml(chromeDriver.PageSource);
-                var fn = document.DocumentNode.SelectSingleNode(".//div[@class='ep-infos-txt']").InnerText.Split(new []{"\r\n" },StringSplitOptions.RemoveEmptyEntries).Where(x=>!string.IsNullOrWhiteSpace(x)).ToList();
+                var fn = document.DocumentNode.SelectSingleNode(".//div[@class='ep-infos-txt']").InnerText.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
                 var email = document.DocumentNode.SelectSingleNode(".//div[@id='adresse_perso_mail_tooltip']")?.SelectSingleNode(".//a")?.GetAttributeValue("href", "")?.Replace("Mailto:", "");
                 var phone = document.DocumentNode.SelectSingleNode(".//div[@id='adresse_perso_phone_tooltip']")?.InnerText?.Trim();
 
@@ -54,6 +55,7 @@ namespace Skema.edu
             }
 
             var serializeObject = JsonConvert.SerializeObject(models);
+            WriteCSV(models, @"E:\kamil.csv");
         }
 
         private static void GetLink()
