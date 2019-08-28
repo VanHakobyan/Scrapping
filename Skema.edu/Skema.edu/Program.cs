@@ -16,6 +16,7 @@ namespace Skema.edu
     {
         static void Main(string[] args)
         {
+            var d = K(2.91);
             //GetLink();
             GetProfile();
         }
@@ -23,7 +24,7 @@ namespace Skema.edu
         private static void GetProfile()
         {
             List<Model> models = new List<Model>();
-            var text = File.ReadAllText((@"E:\kamil.json"));
+            var text = File.ReadAllText((@"D:\kamil.json"));
             var links = JsonConvert.DeserializeObject<List<string>>(text);
             links = links.Select(x => x.Insert(0, "https://alumni.skema.edu/fr")).ToList();
             ChromeDriver chromeDriver = new ChromeDriver();
@@ -41,8 +42,14 @@ namespace Skema.edu
 
                 var name = fn[0].Trim().Split(' ')[0];
                 var name2 = fn[0].Trim().Split(' ')[1];
-                var name3 = fn[1].Trim().Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)[0];
-                var name4 = fn[1].Trim().Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)[1];
+                var a = fn[1].Trim().Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+
+                var name3 = "";
+                if (a.Length > 1) name3 = a[0];
+
+                var name4 = "";
+                if (a.Length > 1) name4 = a[1];
+
                 models.Add(new Model
                 {
                     Email = email,
@@ -55,7 +62,7 @@ namespace Skema.edu
             }
 
             var serializeObject = JsonConvert.SerializeObject(models);
-            WriteCSV(models, @"E:\kamil.csv");
+            WriteCSV(models,@"d:\aaadasdaca.csv");
         }
 
         private static void GetLink()
@@ -102,6 +109,24 @@ namespace Skema.edu
                     writer.WriteLine(string.Join(", ", props.Select(p => p.GetValue(item, null))));
                 }
             }
+        }
+
+
+        public static double K(double price)
+        {
+            double[] odds = { 1.2, 1.5, 2.5, 2.8, 3, 3.9, 8, 10, 15, 20, 25 };
+            var res = odds[0];
+            var min = Math.Abs(price - odds[0]);
+            for (int i = 1; odds[i++] < price && i < odds.Length;)
+            {
+                if (Math.Abs(odds[i] - price) < min)
+                {
+                    min = Math.Abs(odds[i] - price);
+                    res = odds[i];
+                }
+            }
+
+            return res;
         }
     }
 }
