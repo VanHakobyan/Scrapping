@@ -8,11 +8,13 @@
         Title="Scrapping" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="23*"/>
+            <ColumnDefinition Width="*" ></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Button Content="Start" Grid.Column="1" HorizontalAlignment="Left" Margin="300,10,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
-        <DataGrid Name="Grid" Grid.Column="1" Height="100" Margin="10" />
+        <StackPanel Orientation="Vertical" Grid.Column="0" Margin="20" HorizontalAlignment="Center" MinHeight="300" MinWidth="600">
+            <TextBox Name="Link" Margin="10"/>
+            <Button Content="Start"  HorizontalAlignment="Center"  VerticalAlignment="Top" Click="Button_Click"/>
+            <DataGrid Name="Grid" MinHeight="275" MinWidth="550"  Margin="10" />
+        </StackPanel>
 
     </Grid>
 </Window>
