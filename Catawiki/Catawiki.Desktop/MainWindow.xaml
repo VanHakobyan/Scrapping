@@ -13,6 +13,7 @@
         <StackPanel Orientation="Vertical" Grid.Column="0" Margin="20" HorizontalAlignment="Center" MinHeight="300" MinWidth="600">
             <TextBox Name="Link" Margin="10"/>
             <Button Content="Start"  HorizontalAlignment="Center"  VerticalAlignment="Top" Click="Button_Click"/>
+            <Button Content="Export" HorizontalAlignment="Center"  VerticalAlignment="Top" Click="Export_Click"/>
             <DataGrid Name="Grid" MinHeight="275" MinWidth="550"  Margin="10" />
         </StackPanel>
 

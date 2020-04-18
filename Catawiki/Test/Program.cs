@@ -8,7 +8,7 @@ namespace Test
         static async Task Main(string[] args)
         {
             Scrapping scr = new Scrapping();
-            await scr.Start(null);
+            var res = await scr.Start(null);
         }
     }
 }

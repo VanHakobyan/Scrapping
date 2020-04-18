@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,8 +31,29 @@ namespace Catawiki.Desktop
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             var dataModels = await Scrapping.Start(Link.Text);
-            dataModels.Add(new Lib.DataModel { CurrentBid = "3", Name = "Mane", CurrentBidAmount = 6, BiddingEndTime = DateTime.Now });//TODO: will remove
+            //dataModels.Add(new Lib.DataModel { CurrentBid = "3", Name = "Mane", CurrentBidAmount = 6, BiddingEndTime = DateTime.Now });//TODO: will remove
             Grid.ItemsSource = dataModels;
         }
+
+        private void Export_Click(object sender, RoutedEventArgs e)
+        {
+            var datagrid_Results = (DataGrid)Grid.ItemsSource;
+            datagrid_Results.SelectAllCells();
+
+            datagrid_Results.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
+            ApplicationCommands.Copy.Execute(null, datagrid_Results);
+
+            datagrid_Results.UnselectAllCells();
+            datagrid_Results.SelectAllCells();
+
+            datagrid_Results.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
+            ApplicationCommands.Copy.Execute(null, datagrid_Results);
+
+            datagrid_Results.UnselectAllCells();
+
+            string result = (string)System.Windows.Clipboard.GetData(System.Windows.DataFormats.CommaSeparatedValue);
+
+            File.AppendAllText("D:\test\\catawiki.csv", result, UnicodeEncoding.UTF8);
+        }
     }
-}
+    }

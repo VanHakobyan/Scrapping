@@ -33,6 +33,7 @@ namespace Catawiki.Lib
 
         public async Task<List<DataModel>> Start(string link)
         {
+            var result = new List<DataModel>();
             try
             {
                 _driver.Navigate().GoToUrl(string.IsNullOrEmpty(link) ? Link : link);
@@ -40,43 +41,56 @@ namespace Catawiki.Lib
                 doc.LoadHtml(_driver.PageSource);
                 var nodes = doc.DocumentNode;
                 var pageNumber = Convert.ToInt32(HtmlDocumentHelper.GetNodeByParams(nodes, "nav", "class", "be-pagination u-margin-t-large").ChildNodes[4].InnerText);
-                var result = new List<DataModel>();
                 // iterate through every page
-                for (int i = 1; i <= pageNumber; i++)
+                try
                 {
-                    var ids = "";
-                    var listPerPage = new List<DataModel>();
-                    _driver.Navigate().GoToUrl(Link + $"?page={i}");
-                    doc.LoadHtml(_driver.PageSource);
-                    var lots = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, "div", "class", "be-lot-list gallery");
-                    foreach (var lot in lots.ChildNodes)
+                    for (int i = 1; i <= pageNumber; i++)
                     {
-                        var name = HtmlDocumentHelper.GetNodeByParams(lot, "h2", "class", "c-card__title be-lot__title").InnerText;
-                        var url = HtmlDocumentHelper.GetNodeByParams(lot, "a", "class", "c-card").GetAttributeValue("href", null);
-                        var id = new Uri(url).Segments[2].Split('-')[0];
-                        listPerPage.Add(new DataModel { Name = name, Url = url, CurrentBid = id });
-                        ids += $",{id}";
+                        var ids = ""; // list of ids 
+                        var listPerPage = new List<DataModel>(); // list of lots per page
+                        _driver.Navigate().GoToUrl(Link + $"?page={i}");
+                        doc.LoadHtml(_driver.PageSource);
+                        var lots = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, "div", "class", "be-lot-list gallery");
+                        foreach (var lot in lots.ChildNodes)
+                        {
+                            var name = HtmlDocumentHelper.GetNodeByParams(lot, "h2", "class", "c-card__title be-lot__title").InnerText;
+                            var url = HtmlDocumentHelper.GetNodeByParams(lot, "a", "class", "c-card").GetAttributeValue("href", null);
+                            var id = new Uri(url).Segments[2].Split('-')[0];
+                            listPerPage.Add(new DataModel { Name = name, Url = url, CurrentBid = id });
+                            ids += $",{id}";
+                        }
+                        ids = ids.Substring(1, ids.Length - 1);
+                        var helper = new RequestHelper();
+                        var response = await helper.SendRequestAsync($"{JsonURL}?ids={ids}", automaticDecompression: true, headers: HeaderBuilder.GetDefaultHeaders());
+                        var list = JsonConvert.DeserializeObject<JsonResult>(response);
+                        try
+                        {
+                            foreach (var item in listPerPage)
+                            {
+                                var correspondentItem = list.Lots.FirstOrDefault(x => x.id == Convert.ToInt32(item.CurrentBid));
+                                item.BiddingEndTime = correspondentItem.bidding_end_time;
+                                var amount = correspondentItem.current_bid_amount;
+                                item.CurrentBidAmount = amount.EUR;
+                                result.Add(item);
+                            };
+                        }
+                        catch
+                        {
+
+                        }
                     }
-                    ids = ids.Substring(1, ids.Length - 1);
-                    var helper = new RequestHelper();
-                    var response = await helper.SendRequestAsync($"{JsonURL}?ids={ids}", automaticDecompression: true, headers: HeaderBuilder.GetDefaultHeaders());
-                    var list = JsonConvert.DeserializeObject<JsonResult>(response);
-                    foreach (var item in listPerPage)
-                    {
-                        var correspondentItem = list.Lots.SingleOrDefault(x => x.CurrentBid == item.CurrentBid);
-                        item.BiddingEndTime = correspondentItem.BiddingEndTime;
-                        item.CurrentBidAmount = correspondentItem.CurrentBidAmount;
-                        result.Add(item);
-                    };
                 }
+                catch (Exception ex)
+                {
+
+                }
+                
             }
             catch (Exception e)
             {
                 //ignore
             }
-
-
-            return new List<DataModel>();
+            return result;
         }
 
         public async Task QuitSelenium()

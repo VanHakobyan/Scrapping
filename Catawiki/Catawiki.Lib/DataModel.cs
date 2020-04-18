@@ -15,6 +15,12 @@ namespace Catawiki.Lib
         public DateTime BiddingEndTime { get; set; }
         public string Url { get; set; }
     }
+    public class Currency
+    {
+        public decimal USD { get; set; }
+        public decimal GBP { get; set; }
+        public decimal EUR { get; set; }
+    }
     public class JsonResult
     {
         [JsonProperty("lots")]
@@ -22,7 +28,7 @@ namespace Catawiki.Lib
     }
     public class DataModelJSON
     {
-        public decimal current_bid_amount { get; set; }
+        public Currency current_bid_amount { get; set; }
         public int id { get; set; }
         public DateTime bidding_end_time { get; set; }
     }
