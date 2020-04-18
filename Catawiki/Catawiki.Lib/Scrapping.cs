@@ -60,9 +60,9 @@ namespace Catawiki.Lib
                 var list = JsonConvert.DeserializeObject<JsonResult>(response);
                 foreach (var item in listPerPage)
                 {
-                    var correspondentItem = list.Lots.Where(x => x.CurrentBid == item.CurrentBid).SingleOrDefault();
-                    item.BiddingEndTime = correspondentItem.BiddingEndTime;
-                    item.CurrentBidAmount = correspondentItem.CurrentBidAmount;
+                    var correspondentItem = list.Lots.Where(x => x.id == Convert.ToInt32(item.CurrentBid)).SingleOrDefault();
+                    item.BiddingEndTime = correspondentItem.bidding_end_time;
+                    item.CurrentBidAmount = correspondentItem.current_bid_amount;
                     result.Add(item);
                 };
             }

@@ -10,17 +10,20 @@ namespace Catawiki.Lib
     public class DataModel
     {
         public string Name { get; set; }
-        [JsonProperty("current_bid_amount")]
         public decimal CurrentBidAmount { get; set; }
-        [JsonProperty("id")]
         public string CurrentBid { get; set; }
-        [JsonProperty("bidding_end_time")]
         public DateTime BiddingEndTime { get; set; }
         public string Url { get; set; }
     }
     public class JsonResult
     {
         [JsonProperty("lots")]
-        public List<DataModel> Lots { get; set;  }
+        public List<DataModelJSON> Lots { get; set;  }
+    }
+    public class DataModelJSON
+    {
+        public decimal current_bid_amount { get; set; }
+        public int id { get; set; }
+        public DateTime bidding_end_time { get; set; }
     }
 }
