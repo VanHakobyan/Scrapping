@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataModel.cs" />
     <Compile Include="Scrapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
