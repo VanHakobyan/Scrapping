@@ -20,9 +20,17 @@ namespace Catawiki.Desktop
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static readonly Lib.Scrapping Scrapping = new Lib.Scrapping();
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var dataModels = await Scrapping.Start();
+            dataModels.Add(new Lib.DataModel { CurrentBid = "3", Name = "Mane", CurrentBidAmount = 6, BiddingEndTime = DateTime.Now });//TODO: will remove
+            Grid.ItemsSource = dataModels;
         }
     }
 }
