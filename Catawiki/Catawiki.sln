@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catawiki.Desktop", "Catawik
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catawiki.Lib", "Catawiki.Lib\Catawiki.Lib.csproj", "{23CDEFCD-E5BA-4488-A59C-F8E490A8FE0E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{5C44EF37-12DA-44E2-B70F-10079B904567}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{23CDEFCD-E5BA-4488-A59C-F8E490A8FE0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23CDEFCD-E5BA-4488-A59C-F8E490A8FE0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23CDEFCD-E5BA-4488-A59C-F8E490A8FE0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C44EF37-12DA-44E2-B70F-10079B904567}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C44EF37-12DA-44E2-B70F-10079B904567}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C44EF37-12DA-44E2-B70F-10079B904567}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C44EF37-12DA-44E2-B70F-10079B904567}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
