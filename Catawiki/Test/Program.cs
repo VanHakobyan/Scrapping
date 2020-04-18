@@ -1,5 +1,5 @@
-﻿using Catawiki.Lib;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Catawiki.Lib;
 
 namespace Test
 {
@@ -8,7 +8,7 @@ namespace Test
         static async Task Main(string[] args)
         {
             Scrapping scr = new Scrapping();
-            await scr.Start();
+            await scr.Start(null);
         }
     }
 }

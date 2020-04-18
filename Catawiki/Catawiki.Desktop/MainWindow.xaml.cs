@@ -28,7 +28,7 @@ namespace Catawiki.Desktop
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var dataModels = await Scrapping.Start();
+            var dataModels = await Scrapping.Start(Link.Text);
             dataModels.Add(new Lib.DataModel { CurrentBid = "3", Name = "Mane", CurrentBidAmount = 6, BiddingEndTime = DateTime.Now });//TODO: will remove
             Grid.ItemsSource = dataModels;
         }

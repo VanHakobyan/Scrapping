@@ -10,6 +10,7 @@ using OpenQA.Selenium.Chrome;
 using Scrapping.AllPossibilities;
 using Scrapping.AllPossibilities.Http;
 using Scrapping.AllPossibilities.Selenium;
+using HtmlAttribute = Scrapping.AllPossibilities.Enums.HtmlAttribute;
 
 namespace Catawiki.Lib
 {
@@ -29,7 +30,7 @@ namespace Catawiki.Lib
             });
         }
 
-        public async Task<List<DataModel>> Start()
+        public async Task<List<DataModel>> Start(string link)
         {
             await Task.Delay(0);
             _driver.Navigate().GoToUrl(Link);
