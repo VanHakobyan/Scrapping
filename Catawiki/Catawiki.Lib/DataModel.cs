@@ -36,7 +36,7 @@ namespace Catawiki.Lib
         public Currency current_bid_amount { get; set; }
         public int id { get; set; }
         public DateTime bidding_end_time { get; set; }
-        public string reserve_price_met { get; set; }
+        public bool? reserve_price_met { get; set; }
 
     }
 }

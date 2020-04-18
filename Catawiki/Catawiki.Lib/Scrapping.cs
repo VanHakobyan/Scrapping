@@ -44,9 +44,9 @@ namespace Catawiki.Lib
                 // iterate through every page
                 try
                 {
-                    for (int i = 1; i <= pageNumber; i++)
+                    for (var i = 1; i <= pageNumber; i++)
                     {
-                        var ids = ""; // list of ids 
+                        StringBuilder sb = new StringBuilder(); // list of ids 
                         var listPerPage = new List<DataModel>(); // list of lots per page
                         _driver.Navigate().GoToUrl(Link + $"?page={i}");
                         doc.LoadHtml(_driver.PageSource);
@@ -57,9 +57,11 @@ namespace Catawiki.Lib
                             var url = HtmlDocumentHelper.GetNodeByParams(lot, "a", "class", "c-card").GetAttributeValue("href", null);
                             var id = new Uri(url).Segments[2].Split('-')[0];
                             listPerPage.Add(new DataModel { Name = name, Url = url, CurrentBid = int.Parse(id) });
-                            ids += $",{id}";
+                            sb.Append($",{id}");
                         }
-                        ids = ids.Substring(1, ids.Length - 1);
+
+                        var ids = sb.ToString().TrimStart(',');
+
                         var helper = new RequestHelper();
                         var response = await helper.SendRequestAsync($"{JsonURL}?ids={ids}", automaticDecompression: true, headers: HeaderBuilder.GetDefaultHeaders());
                         var list = JsonConvert.DeserializeObject<JsonResult>(response);
@@ -72,21 +74,21 @@ namespace Catawiki.Lib
                                 item.BiddingEndTime = correspondentItem.bidding_end_time;
                                 var amount = correspondentItem.current_bid_amount;
                                 item.CurrentBidAmount = amount.EUR;
-                                item.ReservedPrice = correspondentItem.reserve_price_met == null ? "No reserve price" : correspondentItem.reserve_price_met;
+                                item.ReservedPrice = correspondentItem.reserve_price_met.HasValue && correspondentItem.reserve_price_met.Value ? "Has reserve price" : "No reserve price";
                                 result.Add(item);
 
                             }
                             catch
                             {
-
+                                //ignore
                             }
                         };
 
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-
+                    //ignore
                 }
 
             }
