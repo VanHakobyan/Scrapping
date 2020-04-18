@@ -46,7 +46,7 @@ namespace Catawiki.Lib
                 {
                     for (var i = 1; i <= pageNumber; i++)
                     {
-                        StringBuilder sb = new StringBuilder(); // list of ids 
+                        var sb = new StringBuilder(); // list of ids 
                         var listPerPage = new List<DataModel>(); // list of lots per page
                         _driver.Navigate().GoToUrl(Link + $"?page={i}");
                         doc.LoadHtml(_driver.PageSource);
