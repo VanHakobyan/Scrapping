@@ -31,9 +31,9 @@ namespace Catawiki.Lib
             });
         }
 
-        public async Task<List<DataModel>> Start(string link)
+        public async Task<List<DataModelBase>> Start(string link)
         {
-            var result = new List<DataModel>();
+            var result = new List<DataModelBase>();
             try
             {
                 _driver.Navigate().GoToUrl(string.IsNullOrEmpty(link) ? Link : link);
@@ -56,35 +56,39 @@ namespace Catawiki.Lib
                             var name = HtmlDocumentHelper.GetNodeByParams(lot, "h2", "class", "c-card__title be-lot__title").InnerText;
                             var url = HtmlDocumentHelper.GetNodeByParams(lot, "a", "class", "c-card").GetAttributeValue("href", null);
                             var id = new Uri(url).Segments[2].Split('-')[0];
-                            listPerPage.Add(new DataModel { Name = name, Url = url, CurrentBid = id });
+                            listPerPage.Add(new DataModel { Name = name, Url = url, CurrentBid = int.Parse(id) });
                             ids += $",{id}";
                         }
                         ids = ids.Substring(1, ids.Length - 1);
                         var helper = new RequestHelper();
                         var response = await helper.SendRequestAsync($"{JsonURL}?ids={ids}", automaticDecompression: true, headers: HeaderBuilder.GetDefaultHeaders());
                         var list = JsonConvert.DeserializeObject<JsonResult>(response);
-                        try
+
+                        foreach (var item in listPerPage)
                         {
-                            foreach (var item in listPerPage)
+                            try
                             {
-                                var correspondentItem = list.Lots.FirstOrDefault(x => x.id == Convert.ToInt32(item.CurrentBid));
+                                var correspondentItem = list.Lots.FirstOrDefault(x => x.id == item.CurrentBid);
                                 item.BiddingEndTime = correspondentItem.bidding_end_time;
                                 var amount = correspondentItem.current_bid_amount;
                                 item.CurrentBidAmount = amount.EUR;
+                                item.ReservedPrice = correspondentItem.reserve_price_met == null ? "No reserve price" : correspondentItem.reserve_price_met;
                                 result.Add(item);
-                            };
-                        }
-                        catch
-                        {
 
-                        }
+                            }
+                            catch
+                            {
+
+                            }
+                        };
+
                     }
                 }
                 catch (Exception ex)
                 {
 
                 }
-                
+
             }
             catch (Exception e)
             {

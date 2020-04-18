@@ -7,13 +7,18 @@ using System.Threading.Tasks;
 
 namespace Catawiki.Lib
 {
-    public class DataModel
+    public class DataModelBase
     {
         public string Name { get; set; }
         public decimal CurrentBidAmount { get; set; }
-        public string CurrentBid { get; set; }
         public DateTime BiddingEndTime { get; set; }
         public string Url { get; set; }
+        public string ReservedPrice { get; set; }
+    }
+    public class DataModel : DataModelBase
+    {
+        public int CurrentBid { get; set; }
+
     }
     public class Currency
     {
@@ -24,12 +29,14 @@ namespace Catawiki.Lib
     public class JsonResult
     {
         [JsonProperty("lots")]
-        public List<DataModelJSON> Lots { get; set;  }
+        public List<DataModelJSON> Lots { get; set; }
     }
     public class DataModelJSON
     {
         public Currency current_bid_amount { get; set; }
         public int id { get; set; }
         public DateTime bidding_end_time { get; set; }
+        public string reserve_price_met { get; set; }
+
     }
 }

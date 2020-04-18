@@ -37,23 +37,32 @@ namespace Catawiki.Desktop
 
         private void Export_Click(object sender, RoutedEventArgs e)
         {
-            var datagrid_Results = (DataGrid)Grid.ItemsSource;
-            datagrid_Results.SelectAllCells();
+            Grid.SelectAllCells();
 
-            datagrid_Results.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
-            ApplicationCommands.Copy.Execute(null, datagrid_Results);
+            Grid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
+            ApplicationCommands.Copy.Execute(null, Grid);
 
-            datagrid_Results.UnselectAllCells();
-            datagrid_Results.SelectAllCells();
+            Grid.UnselectAllCells();
+            Grid.SelectAllCells();
 
-            datagrid_Results.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
-            ApplicationCommands.Copy.Execute(null, datagrid_Results);
+            Grid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
+            ApplicationCommands.Copy.Execute(null, Grid);
 
-            datagrid_Results.UnselectAllCells();
+            Grid.UnselectAllCells();
 
-            string result = (string)System.Windows.Clipboard.GetData(System.Windows.DataFormats.CommaSeparatedValue);
+            var result = Clipboard.GetData(System.Windows.DataFormats.CommaSeparatedValue) as string;
 
-            File.AppendAllText("D:\test\\catawiki.csv", result, UnicodeEncoding.UTF8);
+            if (string.IsNullOrEmpty(result))
+            {
+                MessageBox.Show("Something went wrong");
+                return;
+            }
+            using (StreamWriter writer = new StreamWriter(@"D:/test/catawiki.csv"))
+            {
+                writer.Write(result);
+            }
+            MessageBox.Show("Successfully exported");
+           // File.AppendAllText(@"D:/test/catawiki.csv", result, UnicodeEncoding.UTF8);
         }
     }
-    }
+}
