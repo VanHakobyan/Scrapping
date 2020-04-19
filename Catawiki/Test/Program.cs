@@ -30,7 +30,7 @@ namespace Test
             try
             {
                 var data = await Start(Link);
-                WriteCollectionToCsv(data, @"D:\Export.csv");
+                WriteCollectionToCsvNew(data, @"D:\Export.csv");
                 Console.WriteLine("For exit select any key!!!");
                 Console.ReadKey();
             }
@@ -62,11 +62,18 @@ namespace Test
                         var lots = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, "div", "class", "be-lot-list gallery");
                         foreach (var lot in lots.ChildNodes)
                         {
-                            var name = HtmlDocumentHelper.GetNodeByParams(lot, "h2", "class", "c-card__title be-lot__title").InnerText;
-                            var url = HtmlDocumentHelper.GetNodeByParams(lot, "a", "class", "c-card").GetAttributeValue("href", null);
-                            var id = new Uri(url).Segments[2].Split('-')[0];
-                            listPerPage.Add(new DataModel { Name = Quoted(name), Url = Quoted(url), CurrentBid = int.Parse(id) });
-                            sb.Append($",{id}");
+                            try
+                            {
+                                var name = HtmlDocumentHelper.GetNodeByParams(lot, "h2", "class", "c-card__title be-lot__title").InnerText;
+                                var url = HtmlDocumentHelper.GetNodeByParams(lot, "a", "class", "c-card").GetAttributeValue("href", null);
+                                var id = new Uri(url).Segments[2].Split('-')[0];
+                                listPerPage.Add(new DataModel { Name = name, Url = url, CurrentBid = int.Parse(id) });
+                                sb.Append($",{id}");
+                            }
+                            catch
+                            {
+
+                            }
                         }
 
                         var ids = sb.ToString().TrimStart(',');
@@ -107,7 +114,7 @@ namespace Test
             }
             return result;
         }
-        public static bool WriteCollectionToCsv<T>(IEnumerable<T> items, string path)
+        public static bool WriteCollectionToCsvNew<T>(IEnumerable<T> items, string path)
         {
             try
             {
@@ -120,20 +127,16 @@ namespace Test
 
                     foreach (var item in items)
                     {
-                        writer.WriteLine(string.Join(", ", props.Select(p => p.GetValue(item, null))));
+                        writer.WriteLine($"{string.Join(", ", props.Select(p => $"\"{p.GetValue(item, null)}\""))}");
                     }
                 }
 
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
-        }
-        private static string Quoted(string text)
-        {
-            return text.Replace(","," ");
         }
     }
     public class DataModelBase
