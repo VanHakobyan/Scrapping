@@ -72,7 +72,7 @@ namespace Test
                             }
                             catch
                             {
-
+                                //ignore
                             }
                         }
 
