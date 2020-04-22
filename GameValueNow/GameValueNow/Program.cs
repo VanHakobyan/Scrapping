@@ -6,51 +6,63 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Scrapping.AllPossibilities;
+using Scrapping.AllPossibilities.Enums;
 using Scrapping.AllPossibilities.Http;
+using HtmlAttribute = Scrapping.AllPossibilities.Enums.HtmlAttribute;
 
 namespace GameValueNow
 {
     class Program
     {
         private const string pageURL = "https://gamevaluenow.com";
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            var html = HttpCall(pageURL);
+            var requestHelper = new RequestHelper();
+            var html = await requestHelper.SendRequestAsync(pageURL);
 
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
             var result = new List<GameValueNowModel>();
-            ///html[1]/body[1]/div[2]/div[1]/section[3]/div[4]
-            var containerNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, "div", "class", "platforms-container");
-            var nodes = HtmlDocumentHelper.GetNodesByParams(containerNode, "div", "class", "platform");
+            var containerNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute._class, "platforms-container");
+            var nodes = containerNode.SelectNodes(".//a").Select(x => x.GetAttributeValue("href", null)).Where(x => x != null);
             foreach (var node in nodes)
             {
                 var model = new GameValueNowModel();
-                var url = pageURL + node.ChildNodes[1].GetAttributeValue("href", null);
-                var name = node.ChildNodes[1].ChildNodes[3].InnerText;
-                model.URL = url; model.PlatformName = name;
+                var url = $"{pageURL}{node}";
+                model.URL = url;
+                //var name = node.ChildNodes[1].ChildNodes[3].InnerText;
+                //model.PlatformName = name;
                 result.Add(model);
             }
-            foreach(var item in result)
+            foreach (var item in result)
             {
-                html = HttpCall(item.URL);
+                html = await requestHelper.SendRequestAsync(item.URL);
                 doc.LoadHtml(html);
-                var node = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, "div", "class", "col-100 stat");
-                var l = node.ChildNodes[3].InnerText;
-
-            }
-            
-        }
-        public static string HttpCall(string pageUrl)
-        {
-            HttpClient client = new HttpClient();
-            using (HttpResponseMessage response = client.GetAsync(pageUrl).Result)
-            {
-                using (HttpContent content = response.Content)
+                //var node = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, "div", "class", "col-100 stat");
+                //var l = node.ChildNodes[3].InnerText;
+                var listNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute.id, "item-list");
+                var collectionItemNodes = HtmlDocumentHelper.GetNodesByParams(listNode, HtmlTag.div, HtmlAttribute._class, "item-row desktop all licensed");
+                foreach (var collectionItemNode in collectionItemNodes)
                 {
-                    return content.ReadAsStringAsync().Result;
+                    var name = HtmlDocumentHelper.GetNodeByParams(collectionItemNode, HtmlTag.a, HtmlAttribute._class, "game-link").InnerText;
+                    var priceContainer = HtmlDocumentHelper.GetNodeByParamsUseXpathContains(collectionItemNode, HtmlTag.div, HtmlAttribute._class, "price-col-container");
+                    //more logic
                 }
             }
+
         }
+
+
+        //public static string HttpCall(string pageUrl)
+        //{
+        //    var client = new HttpClient();
+        //    using (HttpResponseMessage response = client.GetAsync(pageUrl).Result)
+        //    {
+        //        using (HttpContent content = response.Content)
+        //        {
+        //            return content.ReadAsStringAsync().Result;
+        //        }
+        //    }
+        //}
     }
 }
