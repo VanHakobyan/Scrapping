@@ -36,7 +36,7 @@ namespace GameValueNow
                 html = HttpCall(item.URL);
                 doc.LoadHtml(html);
                 var node = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, "div", "class", "col-100 stat");
-                var l = node.ChildNodes[2].InnerText;
+                var l = node.ChildNodes[3].InnerText;
 
             }
             
