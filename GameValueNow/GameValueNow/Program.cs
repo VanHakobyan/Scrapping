@@ -25,15 +25,20 @@ namespace GameValueNow
             var result = new List<GameValueNowModel>();
             var containerNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute._class, "platforms-container");
             var nodes = containerNode.SelectNodes(".//a").Select(x => x.GetAttributeValue("href", null)).Where(x => x != null);
+            var id = 0;
             foreach (var node in nodes)
             {
-                var model = new GameValueNowModel();
+                var model = new GameValueNowModel() { Id = ++id };
                 var url = $"{pageURL}{node}";
                 model.URL = url;
                 //var name = node.ChildNodes[1].ChildNodes[3].InnerText;
                 //model.PlatformName = name;
                 result.Add(model);
             }
+
+            //var gameContext = new GameContext();
+            //gameContext.GameValueNow.AddRange(result);
+            //await gameContext.SaveChangesAsync();
             foreach (var item in result)
             {
                 html = await requestHelper.SendRequestAsync(item.URL);
@@ -41,7 +46,7 @@ namespace GameValueNow
                 //var node = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, "div", "class", "col-100 stat");
                 //var l = node.ChildNodes[3].InnerText;
                 var listNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute.id, "item-list");
-                var collectionItemNodes = HtmlDocumentHelper.GetNodesByParams(listNode, HtmlTag.div, HtmlAttribute._class, "item-row desktop all licensed");
+                var collectionItemNodes = HtmlDocumentHelper.GetNodesByParamsUseXpathStartsWith(listNode, HtmlTag.div, HtmlAttribute._class, "item-row desktop all");
                 foreach (var collectionItemNode in collectionItemNodes)
                 {
                     var name = HtmlDocumentHelper.GetNodeByParams(collectionItemNode, HtmlTag.a, HtmlAttribute._class, "game-link").InnerText;

@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace GameValueNow
 {
+    [Table("GameValueNowModel")]
     public class GameValueNowModel
     {
+        [Key]
+        public int Id { get; set; }
         public string PlatformName { get; set; }
         public string AvgLoosePrice { get; set; }
         public string AvgCompletePrice { get; set; }
@@ -17,8 +22,10 @@ namespace GameValueNow
         public string URL { get; set; }
         public List<Data> Data { get; set; }
     }
+    [Table("GameData")]
     public class Data
     {
+        [Key]
         public string Id { get; set; }
         public string PlatformName { get; set; }
         public string Title { get; set; }
