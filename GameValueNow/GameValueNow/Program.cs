@@ -30,28 +30,46 @@ namespace GameValueNow
                 var model = new GameValueNowModel();
                 var url = $"{pageURL}{node}";
                 model.URL = url;
-                //var name = node.ChildNodes[1].ChildNodes[3].InnerText;
-                //model.PlatformName = name;
                 result.Add(model);
             }
             foreach (var item in result)
             {
+                item.Data = new List<Data>();
                 html = await requestHelper.SendRequestAsync(item.URL);
                 doc.LoadHtml(html);
-                //var node = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, "div", "class", "col-100 stat");
-                //var l = node.ChildNodes[3].InnerText;
+
+                // stats
+                var statsNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute.id, "stats");
+                var statsContainer = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsNode, HtmlTag.div, HtmlAttribute._class, "col-100 stat");
+                var statsValues = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsNode, HtmlTag.div, HtmlAttribute._class, "col-30 col-30-md stat-value");
+                item.AvgLoosePrice = statsValues[0].InnerText.Replace("\n", "").Replace(" ", "");
+                item.AvgCompletePrice = statsValues[1].InnerText.Replace("\n", "").Replace(" ", "");
+                item.LooseSetValue = statsValues[2].InnerText.Replace("\n", "").Replace(" ", "");
+                item.CompleteSetValue = statsValues[3].InnerText.Replace("\n", "").Replace(" ", "");
+                item.SharpOfGames = statsValues[4].InnerText.Replace("\n", "").Replace(" ", "");
+
+                // items
                 var listNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute.id, "item-list");
-                var collectionItemNodes = HtmlDocumentHelper.GetNodesByParams(listNode, HtmlTag.div, HtmlAttribute._class, "item-row desktop all licensed");
+                var collectionItemNodes = HtmlDocumentHelper.GetNodesByParamsUseXpathStartsWith(listNode, HtmlTag.div, HtmlAttribute._class, "item-row desktop all");
                 foreach (var collectionItemNode in collectionItemNodes)
                 {
+                    var data = new Data();
                     var name = HtmlDocumentHelper.GetNodeByParams(collectionItemNode, HtmlTag.a, HtmlAttribute._class, "game-link").InnerText;
+                    var id = HtmlDocumentHelper.GetNodeByParams(collectionItemNode, HtmlTag.div, HtmlAttribute._class, "item-number").InnerText.Replace("\n", "").Replace(" ", "");
+                    data.Title = name;
+                    data.Id = id;
                     var priceContainer = HtmlDocumentHelper.GetNodeByParamsUseXpathContains(collectionItemNode, HtmlTag.div, HtmlAttribute._class, "price-col-container");
-                    //more logic
+                    //more logic for prices
+                    var prices = HtmlDocumentHelper.GetNodesByParamsUseXpathStartsWith(priceContainer, HtmlTag.div, HtmlAttribute._class, "col-25 col-sm-25 price-col left");
+                    data.Loose = prices[0].InnerText.Replace("\n", "").Replace(" ", "");
+                    data.Complete = prices[1].InnerText.Replace("\n", "").Replace(" ", "");
+                    data.New = prices[2].InnerText.Replace("\n", "").Replace(" ", "");
+                    data.Graded = prices[3].InnerText.Replace("\n", "").Replace(" ", "");
+                    item.Data.Add(data);                             
                 }
             }
 
         }
-
 
         //public static string HttpCall(string pageUrl)
         //{
