@@ -14,22 +14,21 @@ namespace GameValueNow
 {
     class Program
     {
-        private const string pageURL = "https://gamevaluenow.com";
+        private const string PageUrl = "https://gamevaluenow.com";
         static async Task Main(string[] args)
         {
             var requestHelper = new RequestHelper();
-            var html = await requestHelper.SendRequestAsync(pageURL);
+            var html = await requestHelper.SendRequestAsync(PageUrl);
 
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
             var result = new List<GameValueNowModel>();
             var containerNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute._class, "platforms-container");
             var nodes = containerNode.SelectNodes(".//a").Select(x => x.GetAttributeValue("href", null)).Where(x => x != null);
-            var id = 0;
             foreach (var node in nodes)
             {
-                var model = new GameValueNowModel() { Id = ++id };
-                var url = $"{pageURL}{node}";
+                var model = new GameValueNowModel();
+                var url = $"{PageUrl}{node}";
                 model.URL = url;
                 result.Add(model);
             }
@@ -73,19 +72,6 @@ namespace GameValueNow
                     item.Data.Add(data);                             
                 }
             }
-
         }
-
-        //public static string HttpCall(string pageUrl)
-        //{
-        //    var client = new HttpClient();
-        //    using (HttpResponseMessage response = client.GetAsync(pageUrl).Result)
-        //    {
-        //        using (HttpContent content = response.Content)
-        //        {
-        //            return content.ReadAsStringAsync().Result;
-        //        }
-        //    }
-        //}
     }
 }
