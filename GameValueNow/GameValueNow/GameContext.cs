@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GameValueNow
-{
+{ 
     public class SQLiteConfiguration : DbConfiguration
     {
         public SQLiteConfiguration()
