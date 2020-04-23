@@ -72,6 +72,7 @@ namespace GameValueNow
                     data.Complete = prices[1].InnerText.Replace("\n", "").Replace(" ", "");
                     data.New = prices[2].InnerText.Replace("\n", "").Replace(" ", "");
                     data.Graded = prices[3].InnerText.Replace("\n", "").Replace(" ", "");
+                    data.PlatformName = item.PlatformName;
                     item.Data.Add(data);                             
                 }
             }

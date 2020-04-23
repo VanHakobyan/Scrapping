@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GameValueNow
 {
-    [Table("GameValueNowModel")]
+    [Table("GameValueNow")]
     public class GameValueNowModel
     {
         [Key]
@@ -25,7 +25,7 @@ namespace GameValueNow
     [Table("GameData")]
     public class Data
     {
-        [Key]
+        //[Key] //can't be key
         public string Id { get; set; }
         public string PlatformName { get; set; }
         public string Title { get; set; }
