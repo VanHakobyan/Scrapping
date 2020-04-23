@@ -52,8 +52,7 @@ namespace GameValueNow
                 }
                 catch
                 {
-                    //ignore
-                    throw;
+                    //ignore;
                 }
             }
 
@@ -67,11 +66,8 @@ namespace GameValueNow
                     doc.LoadHtml(html);
 
                     // stats
-                    var statsNode =
-                        HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute.id, "stats");
-                    //var statsContainer = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsNode, HtmlTag.div, HtmlAttribute._class, "col-100 stat");
-                    var statsValues = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsNode, HtmlTag.div,
-                        HtmlAttribute._class, "col-30 col-30-md stat-value");
+                    var statsNode =HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute.id, "stats");
+                    var statsValues = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsNode, HtmlTag.div,HtmlAttribute._class, "col-30 col-30-md stat-value");
                     item.AvgLoosePrice = statsValues[0].InnerText.Replace("\n", "").Replace(" ", "");
                     item.AvgCompletePrice = statsValues[1].InnerText.Replace("\n", "").Replace(" ", "");
                     item.LooseSetValue = statsValues[2].InnerText.Replace("\n", "").Replace(" ", "");
@@ -117,6 +113,7 @@ namespace GameValueNow
                 {
                     //ignore
                 }
+                await Task.Delay(500);
             }
 
             using (var gameContext = new GameContext())
@@ -125,8 +122,7 @@ namespace GameValueNow
                 {
                     try
                     {
-                        var platform = gameContext.GameValueNow.Include(g => g.Data)
-                            .FirstOrDefault(x => x.PlatformName == item.PlatformName);
+                        var platform = gameContext.GameValueNow.Include(g => g.Data).FirstOrDefault(x => x.PlatformName == item.PlatformName);
                         if (platform == null)
                         {
                             gameContext.GameValueNow.Add(item);
@@ -138,9 +134,7 @@ namespace GameValueNow
                             {
                                 try
                                 {
-                                    // stupid way, but didn't have time to find something better
-                                    var gameData = gameContext.GameData.FirstOrDefault(g =>
-                                        g.Id == data.Id && g.PlatformName == item.PlatformName);
+                                    var gameData = gameContext.GameData.FirstOrDefault(g =>g.Id == data.Id && g.PlatformName == item.PlatformName);
                                     if (gameData == null)
                                     {
                                         gameContext.GameData.Add(data);
