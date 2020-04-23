@@ -10,6 +10,7 @@ using Scrapping.AllPossibilities;
 using Scrapping.AllPossibilities.Enums;
 using Scrapping.AllPossibilities.Http;
 using HtmlAttribute = Scrapping.AllPossibilities.Enums.HtmlAttribute;
+using System.Data.Entity;
 
 namespace GameValueNow
 {
@@ -77,11 +78,30 @@ namespace GameValueNow
             }
             using (var gameContext = new GameContext())
             {
-                gameContext.GameValueNow.AddRange(result);
+                foreach(var item in result)
+                {
+                    var platform = gameContext.GameValueNow.Include(g => g.Data).Where(x => x.PlatformName == item.PlatformName).FirstOrDefault();
+                    if (platform == null)
+                    {
+                        gameContext.GameValueNow.Add(item);
+                    }
+                    else
+                    {
+                        gameContext.Entry(platform).CurrentValues.SetValues(item);
+                        foreach (var data in item.Data)
+                        {
+                            // stupid way, but didn't have time to find something better
+                            var gameData = gameContext.GameData.Where(g => g.Id == data.Id && g.PlatformName == item.PlatformName).FirstOrDefault();
+                            if (gameData == null)
+                            {
+                                gameContext.GameData.Add(data);
+                            }
+                        }
+                    }
+                }
                 await gameContext.SaveChangesAsync();
             }
-
-           
+      
         }
     }
 }

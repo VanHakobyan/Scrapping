@@ -20,7 +20,7 @@ namespace GameValueNow
         public string CompleteSetValue { get; set; }
         public string SharpOfGames { get; set; }
         public string URL { get; set; }
-        public List<Data> Data { get; set; }
+        public virtual List<Data> Data { get; set; }
     }
     [Table("GameData")]
     public class Data
