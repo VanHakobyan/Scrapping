@@ -27,5 +27,6 @@ namespace GameValueNow
         }
        
         public DbSet<GameValueNowModel> GameValueNow { get; set; }
+        public DbSet<Data> GameData { get; set; }
     }
 }

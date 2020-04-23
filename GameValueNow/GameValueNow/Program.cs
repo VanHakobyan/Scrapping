@@ -45,7 +45,7 @@ namespace GameValueNow
                 // stats
                 var statsNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute.id, "stats");
                 var statsContainer = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsNode, HtmlTag.div, HtmlAttribute._class, "col-100 stat");
-                var statsValues = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsNode, HtmlTag.div, HtmlAttribute._class, "col-30 col-30-md stat-value");
+                var statsValues = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsContainer, HtmlTag.div, HtmlAttribute._class, "col-30 col-30-md stat-value");
                 item.AvgLoosePrice = statsValues[0].InnerText.Replace("\n", "").Replace(" ", "");
                 item.AvgCompletePrice = statsValues[1].InnerText.Replace("\n", "").Replace(" ", "");
                 item.LooseSetValue = statsValues[2].InnerText.Replace("\n", "").Replace(" ", "");
@@ -71,6 +71,10 @@ namespace GameValueNow
                     data.Graded = prices[3].InnerText.Replace("\n", "").Replace(" ", "");
                     item.Data.Add(data);                             
                 }
+            }
+            using (var db = new GameContext())
+            {
+
             }
         }
     }
