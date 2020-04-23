@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,16 +30,14 @@ namespace GameValueNow
             foreach (var node in nodes)
             {
                 var model = new GameValueNowModel();
-                var url = $"{PageUrl}{node.GetAttributeValue("href",null)}";
-                var name = node.SelectNodes(".//p").Select(x => x.InnerText).Where(x => x != null).First();
+                var url = $"{PageUrl}{node.GetAttributeValue("href", null)}";
+                var name = node.SelectNodes(".//p").Select(x => x.InnerText).FirstOrDefault(x => x != null);
                 model.URL = url;
-                model.PlatformName = name;
+                model.PlatformName = WebUtility.HtmlDecode(name);
                 result.Add(model);
             }
 
-            //var gameContext = new GameContext();
-            //gameContext.GameValueNow.AddRange(result);
-            //await gameContext.SaveChangesAsync();
+
             foreach (var item in result)
             {
                 item.Data = new List<Data>();
@@ -73,13 +72,16 @@ namespace GameValueNow
                     data.New = prices[2].InnerText.Replace("\n", "").Replace(" ", "");
                     data.Graded = prices[3].InnerText.Replace("\n", "").Replace(" ", "");
                     data.PlatformName = item.PlatformName;
-                    item.Data.Add(data);                             
+                    item.Data.Add(data);
                 }
             }
-            using (var db = new GameContext())
+            using (var gameContext = new GameContext())
             {
-
+                gameContext.GameValueNow.AddRange(result);
+                await gameContext.SaveChangesAsync();
             }
+
+           
         }
     }
 }

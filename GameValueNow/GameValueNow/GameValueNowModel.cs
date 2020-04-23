@@ -12,7 +12,7 @@ namespace GameValueNow
     public class GameValueNowModel
     {
         [Key]
-       // public int Id { get; set; }
+        // public int Id { get; set; }
         public string PlatformName { get; set; }
         public string AvgLoosePrice { get; set; }
         public string AvgCompletePrice { get; set; }
@@ -25,7 +25,8 @@ namespace GameValueNow
     [Table("GameData")]
     public class Data
     {
-        //[Key] //can't be key
+        [Key] 
+        public int IndexId { get; set; }
         public string Id { get; set; }
         public string PlatformName { get; set; }
         public string Title { get; set; }
