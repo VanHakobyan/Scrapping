@@ -147,17 +147,21 @@ namespace GameValueNow
                             {
                                 gameContext.GameValueNow.Add(item);
                             }
-                            else if (platform.Data == null)//not checked case 
+                            else if (platform.Data == null)
                             {
+                                gameContext.Entry(platform).CurrentValues.SetValues(item);
                                 platform.Data.AddRange(item.Data);
                             }
                             else
                             {
-                                foreach (var dbData in platform.Data)
+                                if(platform.Data != null)
                                 {
-                                    if (item.Data.All(x => x.Id != dbData.Id))
+                                    foreach (var dbData in platform.Data)
                                     {
-                                        gameContext.GameData.Remove(dbData);
+                                        if (item.Data.All(x => x.Id != dbData.Id))
+                                        {
+                                            gameContext.GameData.Remove(dbData);
+                                        }
                                     }
                                 }
                                 gameContext.Entry(platform).CurrentValues.SetValues(item);
