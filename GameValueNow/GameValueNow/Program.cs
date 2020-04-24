@@ -55,6 +55,7 @@ namespace GameValueNow
                     var name = node.InnerText;
                     model.URL = url;
                     model.PlatformName = WebUtility.HtmlDecode(name);
+                    if (result.Select(x => x.PlatformName).Contains(model.PlatformName)) continue;
                     result.Add(model);
                 }
                 catch
@@ -77,7 +78,7 @@ namespace GameValueNow
                     // stats
                     var statsNode = HtmlDocumentHelper.GetNodeByParams(document.DocumentNode, HtmlTag.div, HtmlAttribute.id, "stats");
                     var statListNode = HtmlDocumentHelper.GetNodesByParams(statsNode, HtmlTag.div, HtmlAttribute._class, "col-100 stat");
-                  
+
                     var avgLoosePrice = statListNode.FirstOrDefault(x => x.InnerText.Contains("Avg Loose"));
                     var avgCompletePrice = statListNode.FirstOrDefault(x => x.InnerText.Contains("Avg Complete"));
                     var looseSetValue = statListNode.FirstOrDefault(x => x.InnerText.Contains("Loose Set"));
@@ -160,14 +161,14 @@ namespace GameValueNow
                                             gameContext.GameData.Add(data);
                                         }
                                     }
-                                    catch(Exception e)
+                                    catch (Exception e)
                                     {
                                         //ignore
                                     }
                                 }
                             }
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             //ignore
                         }
