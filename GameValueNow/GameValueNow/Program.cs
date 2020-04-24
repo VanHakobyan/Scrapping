@@ -9,6 +9,7 @@ using Scrapping.AllPossibilities.Enums;
 using Scrapping.AllPossibilities.Http;
 using HtmlAttribute = Scrapping.AllPossibilities.Enums.HtmlAttribute;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
 
 namespace GameValueNow
 {
@@ -146,18 +147,22 @@ namespace GameValueNow
                             {
                                 gameContext.GameValueNow.Add(item);
                             }
+                            else if (platform.Data == null)//not checked case 
+                            {
+                                platform.Data.AddRange(item.Data);
+                            }
                             else
                             {
-                                foreach(var dbData in platform.Data)
+                                foreach (var dbData in platform.Data)
                                 {
-                                    if(!item.Data.Any(x => x.Id == dbData.Id))
+                                    if (item.Data.All(x => x.Id != dbData.Id))
                                     {
                                         gameContext.GameData.Remove(dbData);
                                     }
                                 }
                                 gameContext.Entry(platform).CurrentValues.SetValues(item);
                                 if (item.Data is null || item.Data.Count == 0) continue;
-   
+
                                 foreach (var data in item.Data)
                                 {
                                     try
