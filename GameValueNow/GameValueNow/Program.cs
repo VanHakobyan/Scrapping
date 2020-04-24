@@ -21,7 +21,7 @@ namespace GameValueNow
             {
                 await Parse();
             }
-            catch 
+            catch
             {
                 Console.WriteLine("Error");
             }
@@ -35,17 +35,17 @@ namespace GameValueNow
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
             var result = new List<GameValueNowModel>();
-            var containerNode =
-                HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute._class, "platforms-container");
-            var nodes = containerNode.SelectNodes(".//a").Where(x => x != null);
+            var nodes = HtmlDocumentHelper.GetNodesByParamsUseXpathStartsWith(doc.DocumentNode, HtmlTag.a, HtmlAttribute._class, "brand-");
 
             foreach (var node in nodes)
             {
                 try
                 {
+                    var href = node.GetAttributeValue("href", null);
+                    if (href is null || href == "#") continue;
                     var model = new GameValueNowModel();
-                    var url = $"{PageUrl}{node.GetAttributeValue("href", null)}";
-                    var name = node.SelectNodes(".//p").Select(x => x.InnerText).FirstOrDefault(x => x != null);
+                    var url = $"{PageUrl}{href}";
+                    var name = node.InnerText;
                     model.URL = url;
                     model.PlatformName = WebUtility.HtmlDecode(name);
                     result.Add(model);
@@ -62,12 +62,13 @@ namespace GameValueNow
                 try
                 {
                     item.Data = new List<Data>();
+                    Console.WriteLine(item.URL);
                     html = await requestHelper.SendRequestAsync(item.URL);
                     doc.LoadHtml(html);
 
                     // stats
-                    var statsNode =HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute.id, "stats");
-                    var statsValues = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsNode, HtmlTag.div,HtmlAttribute._class, "col-30 col-30-md stat-value");
+                    var statsNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute.id, "stats");
+                    var statsValues = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsNode, HtmlTag.div, HtmlAttribute._class, "col-30 col-30-md stat-value");
                     item.AvgLoosePrice = statsValues[0].InnerText.Replace("\n", "").Replace(" ", "");
                     item.AvgCompletePrice = statsValues[1].InnerText.Replace("\n", "").Replace(" ", "");
                     item.LooseSetValue = statsValues[2].InnerText.Replace("\n", "").Replace(" ", "");
@@ -134,7 +135,7 @@ namespace GameValueNow
                             {
                                 try
                                 {
-                                    var gameData = gameContext.GameData.FirstOrDefault(g =>g.Id == data.Id && g.PlatformName == item.PlatformName);
+                                    var gameData = gameContext.GameData.FirstOrDefault(g => g.Id == data.Id && g.PlatformName == item.PlatformName);
                                     if (gameData == null)
                                     {
                                         gameContext.GameData.Add(data);
