@@ -14,7 +14,7 @@ namespace GameValueNow
 {
     class Program
     {
-        private const string PageUrl = "https://gamevaluenow.com";
+        private const string PageUrl = "http://gamevaluenow.com";
         static async Task Main()
         {
             try
@@ -30,7 +30,14 @@ namespace GameValueNow
         private static async Task Parse()
         {
             var requestHelper = new RequestHelper();
-            var html = await requestHelper.SendRequestAsync(PageUrl);
+            var hader = HeaderBuilder.BuildOwnHeaders(new HeaderModel()
+            {
+                Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                Host = "gamevaluenow.com",
+                Referer = "https://gamevaluenow.com/",
+                User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36"
+            });
+            var html = await requestHelper.SendRequestAsync(PageUrl, headers: HeaderBuilder.GetDefaultHeaders());
 
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
@@ -62,12 +69,13 @@ namespace GameValueNow
                 try
                 {
                     item.Data = new List<Data>();
-                    Console.WriteLine(item.URL);
-                    html = await requestHelper.SendRequestAsync(item.URL);
-                    doc.LoadHtml(html);
+                    var document = new HtmlDocument();
+                
+                    var dataHtml = await requestHelper.SendRequestAsync(item.URL, headers: hader);
+                    document.LoadHtml(dataHtml);
 
                     // stats
-                    var statsNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute.id, "stats");
+                    var statsNode = HtmlDocumentHelper.GetNodeByParams(document.DocumentNode, HtmlTag.div, HtmlAttribute.id, "stats");
                     var statsValues = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsNode, HtmlTag.div, HtmlAttribute._class, "col-30 col-30-md stat-value");
                     item.AvgLoosePrice = statsValues[0].InnerText.Replace("\n", "").Replace(" ", "");
                     item.AvgCompletePrice = statsValues[1].InnerText.Replace("\n", "").Replace(" ", "");
@@ -77,7 +85,7 @@ namespace GameValueNow
 
                     // items
                     var listNode =
-                        HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.div, HtmlAttribute.id, "item-list");
+                        HtmlDocumentHelper.GetNodeByParams(document.DocumentNode, HtmlTag.div, HtmlAttribute.id, "item-list");
                     var collectionItemNodes = HtmlDocumentHelper.GetNodesByParamsUseXpathStartsWith(listNode, HtmlTag.div,
                         HtmlAttribute._class, "item-row desktop all");
                     foreach (var collectionItemNode in collectionItemNodes)
@@ -110,7 +118,7 @@ namespace GameValueNow
                         }
                     }
                 }
-                catch
+                catch 
                 {
                     //ignore
                 }
@@ -131,6 +139,7 @@ namespace GameValueNow
                         else
                         {
                             gameContext.Entry(platform).CurrentValues.SetValues(item);
+                            if (item.Data is null || item.Data.Count == 0) continue;
                             foreach (var data in item.Data)
                             {
                                 try
