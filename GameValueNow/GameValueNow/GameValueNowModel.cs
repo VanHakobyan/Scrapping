@@ -25,8 +25,8 @@ namespace GameValueNow
     [Table("GameData")]
     public class Data
     {
-        [Key] 
-        public int IndexId { get; set; }
+    //    [Key] 
+        //public int IndexId { get; set; }
         public string Id { get; set; }
         public string PlatformName { get; set; }
         public string Title { get; set; }
