@@ -70,18 +70,25 @@ namespace GameValueNow
                 {
                     item.Data = new List<Data>();
                     var document = new HtmlDocument();
-                
+
                     var dataHtml = await requestHelper.SendRequestAsync(item.URL, headers: hader);
                     document.LoadHtml(dataHtml);
 
                     // stats
                     var statsNode = HtmlDocumentHelper.GetNodeByParams(document.DocumentNode, HtmlTag.div, HtmlAttribute.id, "stats");
-                    var statsValues = HtmlDocumentHelper.GetNodesByParamsUseXpathContains(statsNode, HtmlTag.div, HtmlAttribute._class, "col-30 col-30-md stat-value");
-                    item.AvgLoosePrice = statsValues[0].InnerText.Replace("\n", "").Replace(" ", "");
-                    item.AvgCompletePrice = statsValues[1].InnerText.Replace("\n", "").Replace(" ", "");
-                    item.LooseSetValue = statsValues[2].InnerText.Replace("\n", "").Replace(" ", "");
-                    item.CompleteSetValue = statsValues[3].InnerText.Replace("\n", "").Replace(" ", "");
-                    item.SharpOfGames = statsValues[4].InnerText.Replace("\n", "").Replace(" ", "");
+                    var statListNode = HtmlDocumentHelper.GetNodesByParams(statsNode, HtmlTag.div, HtmlAttribute._class, "col-100 stat");
+                  
+                    var avgLoosePrice = statListNode.FirstOrDefault(x => x.InnerText.Contains("Avg Loose"));
+                    var avgCompletePrice = statListNode.FirstOrDefault(x => x.InnerText.Contains("Avg Complete"));
+                    var looseSetValue = statListNode.FirstOrDefault(x => x.InnerText.Contains("Loose Set"));
+                    var completeSetValue = statListNode.FirstOrDefault(x => x.InnerText.Contains("Complete Set"));
+                    var sharpOfGames = statListNode.FirstOrDefault(x => x.InnerText.Contains("#"));
+
+                    if (avgLoosePrice != null) item.AvgLoosePrice = HtmlDocumentHelper.GetNodeByParamsUseXpathContains(avgLoosePrice, HtmlTag.div, HtmlAttribute._class, "stat-value")?.InnerText?.Trim();
+                    if (avgCompletePrice != null) item.AvgCompletePrice = HtmlDocumentHelper.GetNodeByParamsUseXpathContains(avgCompletePrice, HtmlTag.div, HtmlAttribute._class, "stat-value")?.InnerText?.Trim();
+                    if (looseSetValue != null) item.LooseSetValue = HtmlDocumentHelper.GetNodeByParamsUseXpathContains(looseSetValue, HtmlTag.div, HtmlAttribute._class, "stat-value")?.InnerText?.Trim();
+                    if (completeSetValue != null) item.CompleteSetValue = HtmlDocumentHelper.GetNodeByParamsUseXpathContains(completeSetValue, HtmlTag.div, HtmlAttribute._class, "stat-value")?.InnerText?.Trim();
+                    if (sharpOfGames != null) item.SharpOfGames = HtmlDocumentHelper.GetNodeByParamsUseXpathContains(sharpOfGames, HtmlTag.div, HtmlAttribute._class, "stat-value")?.InnerText?.Trim();
 
                     // items
                     var listNode =
@@ -100,15 +107,15 @@ namespace GameValueNow
                                 .Replace("\n", "").Replace(" ", "");
                             data.Title = name;
                             data.Id = id;
-                            var priceContainer = HtmlDocumentHelper.GetNodeByParamsUseXpathContains(collectionItemNode,
-                                HtmlTag.div, HtmlAttribute._class, "price-col-container");
-
-                            var prices = HtmlDocumentHelper.GetNodesByParamsUseXpathStartsWith(priceContainer, HtmlTag.div,
-                                HtmlAttribute._class, "col-25 col-sm-25 price-col left");
-                            data.Loose = prices[0].InnerText.Replace("\n", "").Replace(" ", "");
-                            data.Complete = prices[1].InnerText.Replace("\n", "").Replace(" ", "");
-                            data.New = prices[2].InnerText.Replace("\n", "").Replace(" ", "");
-                            data.Graded = prices[3].InnerText.Replace("\n", "").Replace(" ", "");
+                            var priceContainer = HtmlDocumentHelper.GetNodeByParamsUseXpathContains(collectionItemNode, HtmlTag.div, HtmlAttribute._class, "price-col-container");
+                            if (priceContainer is null) continue;
+                            var prices = HtmlDocumentHelper.GetNodesByParamsUseXpathStartsWith(priceContainer, HtmlTag.a, HtmlAttribute._class, "game-link");
+                            if (prices is null) continue;
+                            var priceCount = prices.Count;
+                            if (priceCount > 0) data.Loose = prices[0].InnerText;
+                            if (priceCount > 1) data.Complete = prices[1].InnerText;
+                            if (priceCount > 2) data.New = prices[2].InnerText;
+                            if (priceCount > 3) data.Graded = prices[3].InnerText;
                             data.PlatformName = item.PlatformName;
                             item.Data.Add(data);
                         }
@@ -118,7 +125,7 @@ namespace GameValueNow
                         }
                     }
                 }
-                catch 
+                catch (Exception e)
                 {
                     //ignore
                 }
@@ -127,43 +134,51 @@ namespace GameValueNow
 
             using (var gameContext = new GameContext())
             {
-                foreach (var item in result)
+                try
                 {
-                    try
+                    var categories = result.Where(x => x.Data != null);
+                    foreach (var item in categories)
                     {
-                        var platform = gameContext.GameValueNow.Include(g => g.Data).FirstOrDefault(x => x.PlatformName == item.PlatformName);
-                        if (platform == null)
+                        try
                         {
-                            gameContext.GameValueNow.Add(item);
-                        }
-                        else
-                        {
-                            gameContext.Entry(platform).CurrentValues.SetValues(item);
-                            if (item.Data is null || item.Data.Count == 0) continue;
-                            foreach (var data in item.Data)
+                            var platform = gameContext.GameValueNow.Include(g => g.Data).FirstOrDefault(x => x.PlatformName == item.PlatformName);
+                            if (platform == null)
                             {
-                                try
+                                gameContext.GameValueNow.Add(item);
+                            }
+                            else
+                            {
+                                gameContext.Entry(platform).CurrentValues.SetValues(item);
+                                if (item.Data is null || item.Data.Count == 0) continue;
+                                foreach (var data in item.Data)
                                 {
-                                    var gameData = gameContext.GameData.FirstOrDefault(g => g.Id == data.Id && g.PlatformName == item.PlatformName);
-                                    if (gameData == null)
+                                    try
                                     {
-                                        gameContext.GameData.Add(data);
+                                        var gameData = gameContext.GameData.FirstOrDefault(g => g.Id == data.Id && g.PlatformName == item.PlatformName);
+                                        if (gameData == null)
+                                        {
+                                            gameContext.GameData.Add(data);
+                                        }
                                     }
-                                }
-                                catch
-                                {
-                                    //ignore
+                                    catch(Exception e)
+                                    {
+                                        //ignore
+                                    }
                                 }
                             }
                         }
+                        catch(Exception e)
+                        {
+                            //ignore
+                        }
                     }
-                    catch
-                    {
-                        //ignore
-                    }
-                }
 
-                await gameContext.SaveChangesAsync();
+                    await gameContext.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+
+                }
             }
         }
     }
