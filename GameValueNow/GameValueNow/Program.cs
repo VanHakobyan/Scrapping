@@ -64,7 +64,6 @@ namespace GameValueNow
                 }
             }
 
-
             foreach (var item in result)
             {
                 try
@@ -149,8 +148,16 @@ namespace GameValueNow
                             }
                             else
                             {
+                                foreach(var dbData in platform.Data)
+                                {
+                                    if(!item.Data.Any(x => x.Id == dbData.Id))
+                                    {
+                                        gameContext.GameData.Remove(dbData);
+                                    }
+                                }
                                 gameContext.Entry(platform).CurrentValues.SetValues(item);
                                 if (item.Data is null || item.Data.Count == 0) continue;
+   
                                 foreach (var data in item.Data)
                                 {
                                     try
@@ -159,6 +166,11 @@ namespace GameValueNow
                                         if (gameData == null)
                                         {
                                             gameContext.GameData.Add(data);
+                                        }
+                                        else
+                                        {
+                                            gameContext.Entry(gameData).State = EntityState.Modified;
+                                            gameContext.Entry(gameData).CurrentValues.SetValues(data);
                                         }
                                     }
                                     catch (Exception e)
