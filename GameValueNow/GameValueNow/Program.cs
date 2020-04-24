@@ -154,14 +154,11 @@ namespace GameValueNow
                             }
                             else
                             {
-                                if(platform.Data != null)
+                                foreach (var dbData in platform.Data)
                                 {
-                                    foreach (var dbData in platform.Data)
+                                    if (item.Data.All(x => x.Id != dbData.Id))
                                     {
-                                        if (item.Data.All(x => x.Id != dbData.Id))
-                                        {
-                                            gameContext.GameData.Remove(dbData);
-                                        }
+                                        gameContext.GameData.Remove(dbData);
                                     }
                                 }
                                 gameContext.Entry(platform).CurrentValues.SetValues(item);
