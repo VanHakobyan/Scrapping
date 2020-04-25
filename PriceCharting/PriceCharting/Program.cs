@@ -30,11 +30,10 @@ namespace PriceCharting
             var requestHelper = new RequestHelper();
             var hader = HeaderBuilder.BuildOwnHeaders(new HeaderModel()
             {
-                Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                Host = "pricecharting.com",
-                Referer = "http://www.pricecharting.com/",
-                User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36",
-                Allow_Auto_Redirect = false.ToString()
+            //    Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            //    Host = "pricecharting.com",
+            //    Referer = "http://www.pricecharting.com/",
+               User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36"
             });
             var html = await requestHelper.SendRequestAsync(PageUrl, headers: HeaderBuilder.GetDefaultHeaders(), useCookieContainer: true);
 
@@ -100,12 +99,11 @@ namespace PriceCharting
                     category.Data = new List<Data>();
                     var document = new HtmlDocument();
 
-                    //await Task.Delay(60000);
                     var dataHtml = await requestHelper.SendRequestAsync(category.URL, headers: hader, useCookieContainer: true);
                     document.LoadHtml(dataHtml);
                     var table = HtmlDocumentHelper.GetNodeByParams(document.DocumentNode, HtmlTag.table, Scrapping.AllPossibilities.Enums.HtmlAttribute.id, "games_table");
                     if (table == null) continue;
-                    var data = table.SelectNodes(".//tr");
+                    var data = table.SelectNodes(".//tbody//tr");
                     foreach (var product in data)
                     {
                         var title = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "title")?.InnerText;
@@ -114,10 +112,12 @@ namespace PriceCharting
                         var newPrice = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "price numeric new_price")?.InnerText;
                         categoryData.Add(new Data
                         {
-                            Title = title,
-                            LoosePrice = loosePrice,
-                            CIBPrice = cIBPrice,
-                            NewPrice = newPrice
+                            Title = title.Trim(' ', '\n'),
+                            LoosePrice = loosePrice.Trim(' ', '\n'),
+                            CIBPrice = cIBPrice.Trim(' ', '\n'),
+                            NewPrice = newPrice.Trim(' ', '\n'),
+                            Region = category.Region,
+                            CategoryName = category.CategoryName
                         });
                     }
                     category.Data = categoryData;
@@ -128,71 +128,6 @@ namespace PriceCharting
                 }
                 await Task.Delay(500);
             }
-            using (var gameContext = new GameContext())
-            {
-                try
-                {
-                    var categories = result.Where(x => x.Data != null);
-                    foreach (var item in categories)
-                    {
-                        try
-                        {
-                            var category = gameContext.PriceChartingModels.Include(c => c.Data).FirstOrDefault(x => x.CategoryName == item.CategoryName && x.Region == item.Region);
-                            if (category == null)
-                            {
-                                gameContext.PriceChartingModels.Add(item);
-                            }
-                            else if (category.Data == null)
-                            {
-                                gameContext.Entry(category).CurrentValues.SetValues(item);
-                                category.Data.AddRange(item.Data);
-                            }
-                            else
-                            {
-                                foreach (var dbData in category.Data)
-                                {
-                                    if (item.Data.All(x => x.Title != dbData.Title))
-                                    {
-                                        gameContext.PriceChartindData.Remove(dbData);
-                                    }
-                                }
-                                gameContext.Entry(category).CurrentValues.SetValues(item);
-                                if (item.Data is null || item.Data.Count == 0) continue;
-
-                                foreach (var data in item.Data)
-                                {
-                                    try
-                                    {
-                                        var gameData = gameContext.PriceChartindData.FirstOrDefault(g => g.Title == data.Title && g.CategoryName == item.CategoryName && g.Region == item.Region);
-                                        if (gameData == null)
-                                        {
-                                            gameContext.PriceChartindData.Add(data);
-                                        }
-                                        else
-                                        {
-                                            gameContext.Entry(gameData).State = EntityState.Modified;
-                                            gameContext.Entry(gameData).CurrentValues.SetValues(data);
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        //ignore
-                                    }
-                                }
-                            }
-                        }
-                        catch
-                        {
-
-                        }
-                    }
-                }
-                catch
-                {
-
-                }
-            }
         }
     }
-
 }
