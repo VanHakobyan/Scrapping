@@ -17,6 +17,7 @@ namespace PriceCharting
     class Program
     {
         private const string PageUrl = "http://www.pricecharting.com/";
+        private static readonly string FilePath = ConfigurationManager.AppSettings["Path"];
         static async Task Main(string[] args)
         {
             try
@@ -31,9 +32,9 @@ namespace PriceCharting
         private static async Task Parse()
         {
             var requestHelper = new RequestHelper();
-            var hader = HeaderBuilder.BuildOwnHeaders(new HeaderModel()
+            var headers = HeaderBuilder.BuildOwnHeaders(new HeaderModel
             {
-               User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36"
+                User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36"
             });
             var html = await requestHelper.SendRequestAsync(PageUrl, headers: HeaderBuilder.GetDefaultHeaders(), useCookieContainer: true);
 
@@ -54,7 +55,7 @@ namespace PriceCharting
                             foreach (var region in regions)
                             {
                                 var regionName = HtmlDocumentHelper.GetNodeByParams(region, HtmlTag.li, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "title")?.InnerText;
-                                var categories = region.SelectNodes(".//li").Where(x => x.InnerHtml != "");
+                                var categories = region.SelectNodes(".//li").Where(x => x.InnerHtml != string.Empty);
                                 foreach (var category in categories)
                                 {
                                     if (category.ChildNodes[0] == null || category.ChildNodes[0].GetAttributeValue("href", null) == null)
@@ -72,11 +73,10 @@ namespace PriceCharting
                         }
                         else
                         {
-                            var categories = brand.SelectNodes(".//li").Where(x => x.InnerHtml != "");
+                            var categories = brand.SelectNodes(".//li").Where(x => x.InnerHtml != string.Empty);
                             foreach (var category in categories)
                             {
-                                if (category.ChildNodes[0] == null || category.ChildNodes[0].GetAttributeValue("href", null) == null)
-                                    continue;
+                                if (category.ChildNodes[0]?.GetAttributeValue("href", null) == null) continue;
                                 var url = category.ChildNodes[0].GetAttributeValue("href", null);
                                 var name = category.ChildNodes[0].InnerText;
                                 result.Add(new PriceChartingModel
@@ -99,11 +99,11 @@ namespace PriceCharting
                     category.Data = new List<Data>();
                     var document = new HtmlDocument();
 
-                    var dataHtml = await requestHelper.SendRequestAsync(category.URL, headers: hader, useCookieContainer: true);
+                    var dataHtml = await requestHelper.SendRequestAsync(category.URL, headers: headers, useCookieContainer: true);
                     document.LoadHtml(dataHtml);
                     var table = HtmlDocumentHelper.GetNodeByParams(document.DocumentNode, HtmlTag.table, Scrapping.AllPossibilities.Enums.HtmlAttribute.id, "games_table");
-                    if (table == null) continue;
-                    var data = table.SelectNodes(".//tbody//tr");
+                    var data = table?.SelectNodes(".//tbody//tr");
+                    if (data == null) continue;
                     foreach (var product in data)
                     {
                         var title = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "title")?.InnerText;
@@ -127,20 +127,25 @@ namespace PriceCharting
                 await Task.Delay(500);
             }
             var json = JsonConvert.SerializeObject(result, Formatting.Indented);
-            var filePath = ConfigurationManager.AppSettings["Path"];
-            if (String.IsNullOrEmpty(filePath)) return;
-            StringBuilder sb = new StringBuilder(filePath);
-            sb.Append(DateTime.Now.ToString("yyyyMMdd_hhmmss")).Append(".json");
-            FileStream stream;
+
+            if (string.IsNullOrEmpty(FilePath))
+            {
+                Console.WriteLine("Wrong file name");
+                return;
+            }
+
+            var fullPath = $"{FilePath}{DateTime.Now:yyyyMMdd_hhmmss}.json";
             try
             {
-                stream = new FileStream(sb.ToString(), FileMode.OpenOrCreate);
-                using(var writer = new StreamWriter(stream, Encoding.UTF8))
+                using (var stream = new FileStream(fullPath, FileMode.OpenOrCreate))
                 {
-                    writer.Write(json);
+                    using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                    {
+                        writer.Write(json);
+                    }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
