@@ -9,13 +9,17 @@ using Scrapping.AllPossibilities.Enums;
 using Scrapping.AllPossibilities.Http;
 using HtmlAttribute = Scrapping.AllPossibilities.Enums.HtmlAttribute;
 using System.Data.Entity;
-using System.Data.Entity.Migrations;
+using System.IO;
+using System.Text;
+using System.Configuration;
+using Newtonsoft.Json;
 
 namespace GameValueNow
 {
     class Program
     {
         private const string PageUrl = "http://gamevaluenow.com";
+        private static readonly string FilePath = ConfigurationManager.AppSettings["Path"];
         static async Task Main()
         {
             try
@@ -31,7 +35,7 @@ namespace GameValueNow
         private static async Task Parse()
         {
             var requestHelper = new RequestHelper();
-            var hader = HeaderBuilder.BuildOwnHeaders(new HeaderModel()
+            var header = HeaderBuilder.BuildOwnHeaders(new HeaderModel()
             {
                 Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                 Host = "gamevaluenow.com",
@@ -72,7 +76,7 @@ namespace GameValueNow
                     item.Data = new List<Data>();
                     var document = new HtmlDocument();
 
-                    var dataHtml = await requestHelper.SendRequestAsync(item.URL, headers: hader);
+                    var dataHtml = await requestHelper.SendRequestAsync(item.URL, headers: header);
                     document.LoadHtml(dataHtml);
 
                     // stats
@@ -133,6 +137,32 @@ namespace GameValueNow
                 await Task.Delay(500);
             }
 
+            await SaveToJsonFile(result);
+            //await SaveToSql(result);
+        }
+
+        private static async Task SaveToJsonFile(List<GameValueNowModel> result)
+        {
+            var fullPath = $"{FilePath}{DateTime.Now:yyyyMMdd_hhmmss}.json";
+            var json = JsonConvert.SerializeObject(result, Formatting.Indented);
+            try
+            {
+                using (var stream = new FileStream(fullPath, FileMode.OpenOrCreate))
+                {
+                    using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                    {
+                        await writer.WriteAsync(json);
+                    }
+                }
+            }
+            catch
+            {
+                //ignore
+            }
+        }
+
+        public static async Task SaveToSql(List<GameValueNowModel> result)
+        {
             using (var gameContext = new GameContext())
             {
                 try
