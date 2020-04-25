@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
+using Newtonsoft.Json;
 
 namespace PriceCharting
 {
@@ -115,9 +116,7 @@ namespace PriceCharting
                             Title = title.Trim(' ', '\n'),
                             LoosePrice = loosePrice.Trim(' ', '\n'),
                             CIBPrice = cIBPrice.Trim(' ', '\n'),
-                            NewPrice = newPrice.Trim(' ', '\n'),
-                            Region = category.Region,
-                            CategoryName = category.CategoryName
+                            NewPrice = newPrice.Trim(' ', '\n')
                         });
                     }
                     category.Data = categoryData;
@@ -128,6 +127,7 @@ namespace PriceCharting
                 }
                 await Task.Delay(500);
             }
+            var json = JsonConvert.SerializeObject(result);
         }
     }
 }
