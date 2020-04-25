@@ -48,11 +48,12 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Scrapping.AllPossibilities, Version=1.1.2.2, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\Scrapping.AllPossibilities.1.1.2\lib\netstandard2.0\Scrapping.AllPossibilities.dll</HintPath>
+    <Reference Include="Scrapping.AllPossibilities, Version=1.1.1.1, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\Scrapping.AllPossibilities.1.1.1\lib\netstandard2.0\Scrapping.AllPossibilities.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite, Version=1.0.112.1, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Data.SQLite.Core.1.0.112.1\lib\net40\System.Data.SQLite.dll</HintPath>

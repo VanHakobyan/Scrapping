@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using Newtonsoft.Json;
+using System.IO;
+using System.Configuration;
 
 namespace PriceCharting
 {
@@ -31,9 +33,6 @@ namespace PriceCharting
             var requestHelper = new RequestHelper();
             var hader = HeaderBuilder.BuildOwnHeaders(new HeaderModel()
             {
-            //    Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            //    Host = "pricecharting.com",
-            //    Referer = "http://www.pricecharting.com/",
                User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36"
             });
             var html = await requestHelper.SendRequestAsync(PageUrl, headers: HeaderBuilder.GetDefaultHeaders(), useCookieContainer: true);
@@ -127,7 +126,24 @@ namespace PriceCharting
                 }
                 await Task.Delay(500);
             }
-            var json = JsonConvert.SerializeObject(result);
+            var json = JsonConvert.SerializeObject(result, Formatting.Indented);
+            var filePath = ConfigurationManager.AppSettings["Path"];
+            if (String.IsNullOrEmpty(filePath)) return;
+            StringBuilder sb = new StringBuilder(filePath);
+            sb.Append(DateTime.Now.ToString("yyyyMMdd_hhmmss")).Append(".json");
+            FileStream stream;
+            try
+            {
+                stream = new FileStream(sb.ToString(), FileMode.OpenOrCreate);
+                using(var writer = new StreamWriter(stream, Encoding.UTF8))
+                {
+                    writer.Write(json);
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
         }
     }
 }
