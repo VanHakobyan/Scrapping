@@ -105,17 +105,24 @@ namespace PriceCharting
 
                     while (true)
                     {
-                        var jUrl = PageUrlJson.Replace("{category}", category.URL.Split('/').Last()).Replace("{count}", pageCount.ToString());
-                        var dataJson = await requestHelper.SendRequestAsync(jUrl, headers: headers, useCookieContainer: true);
-                        var jsonObj = JsonConvert.DeserializeObject<Response>(dataJson);
-                        response.AddRange(jsonObj.products);
-                        if (jsonObj.products.Length == 50)
+                        try
                         {
-                            pageCount += 50;
-                            Thread.Sleep(100);
-                            continue;
+                            var jUrl = PageUrlJson.Replace("{category}", category.URL.Split('/').Last()).Replace("{count}", pageCount.ToString());
+                            var dataJson = await requestHelper.SendRequestAsync(jUrl, headers: headers, useCookieContainer: true);
+                            var jsonObj = JsonConvert.DeserializeObject<Response>(dataJson);
+                            response.AddRange(jsonObj.products);
+                            if (jsonObj.products.Length == 50)
+                            {
+                                pageCount += 50;
+                                Thread.Sleep(100);
+                                continue;
+                            }
+                            break;
                         }
-                        break;
+                        catch
+                        {
+                            if (pageCount > 5000) break;
+                        }
                     }
 
                     //var document = new HtmlDocument();
@@ -177,7 +184,7 @@ namespace PriceCharting
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
         }
     }
