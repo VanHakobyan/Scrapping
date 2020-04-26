@@ -20,6 +20,12 @@ namespace PriceCharting
         private const string PageUrl = "http://www.pricecharting.com/";
         private const string PageUrlJson = "https://www.pricecharting.com/console/{category}?sort=&cursor={count}&format=json";
         private static readonly string FilePath = ConfigurationManager.AppSettings["Path"];
+        private static readonly RequestHelper RequestHelper = new RequestHelper();
+        private static readonly Dictionary<string, string> Headers = HeaderBuilder.BuildOwnHeaders(new HeaderModel
+        {
+            User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36"
+        });
+
         static async Task Main(string[] args)
         {
             try
@@ -31,14 +37,28 @@ namespace PriceCharting
                 Console.WriteLine("Error");
             }
         }
+
+        private static async Task<string> GetData(string url)
+        {
+            var tryCount = 2;
+            while (tryCount-- > 0)
+            {
+                try
+                {
+                    return await RequestHelper.SendRequestAsync(url, headers: Headers, useCookieContainer: true);
+                }
+                catch
+                {
+                    //ignore
+                }
+            }
+
+            return null;
+        }
+
         private static async Task Parse()
         {
-            var requestHelper = new RequestHelper();
-            var headers = HeaderBuilder.BuildOwnHeaders(new HeaderModel
-            {
-                User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36"
-            });
-            var html = await requestHelper.SendRequestAsync(PageUrl, headers: HeaderBuilder.GetDefaultHeaders(), useCookieContainer: true);
+            var html = await GetData(PageUrl);
 
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
@@ -108,7 +128,7 @@ namespace PriceCharting
                         try
                         {
                             var jUrl = PageUrlJson.Replace("{category}", category.URL.Split('/').Last()).Replace("{count}", pageCount.ToString());
-                            var dataJson = await requestHelper.SendRequestAsync(jUrl, headers: headers, useCookieContainer: true);
+                            var dataJson = await GetData(jUrl);
                             var jsonObj = JsonConvert.DeserializeObject<Response>(dataJson);
                             response.AddRange(jsonObj.products);
                             if (jsonObj.products.Length == 50)
