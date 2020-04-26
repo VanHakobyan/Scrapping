@@ -49,6 +49,7 @@ namespace PriceCharting
                 }
                 catch
                 {
+                    Thread.Sleep(100);
                     //ignore
                 }
             }
