@@ -19,4 +19,25 @@ namespace PriceCharting
         public string NewPrice { get; set; }
 
     }
+
+    public class Response
+    {
+        public string cursor { get; set; }
+        public Product[] products { get; set; }
+    }
+
+    public class Product
+    {
+        public string consoleUri { get; set; }
+        public bool hasProduct { get; set; }
+        public string id { get; set; }
+        public bool isGameCategory { get; set; }
+        public string price1 { get; set; }
+        public string price2 { get; set; }
+        public string price3 { get; set; }
+        public string productName { get; set; }
+        public string productUri { get; set; }
+        public bool wishlistHasProduct { get; set; }
+    }
+
 }

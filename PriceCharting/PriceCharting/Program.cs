@@ -11,12 +11,14 @@ using System.Data.Entity;
 using Newtonsoft.Json;
 using System.IO;
 using System.Configuration;
+using System.Threading;
 
 namespace PriceCharting
 {
     class Program
     {
         private const string PageUrl = "http://www.pricecharting.com/";
+        private const string PageUrlJson = "https://www.pricecharting.com/console/{category}?sort=&cursor={count}&format=json";
         private static readonly string FilePath = ConfigurationManager.AppSettings["Path"];
         static async Task Main(string[] args)
         {
@@ -97,25 +99,53 @@ namespace PriceCharting
                 {
                     var categoryData = new List<Data>();
                     category.Data = new List<Data>();
-                    var document = new HtmlDocument();
+                    var response = new List<Product>();
+                    var pageCount = 0;
 
-                    var dataHtml = await requestHelper.SendRequestAsync(category.URL, headers: headers, useCookieContainer: true);
-                    document.LoadHtml(dataHtml);
-                    var table = HtmlDocumentHelper.GetNodeByParams(document.DocumentNode, HtmlTag.table, Scrapping.AllPossibilities.Enums.HtmlAttribute.id, "games_table");
-                    var data = table?.SelectNodes(".//tbody//tr");
-                    if (data == null) continue;
-                    foreach (var product in data)
+
+                    while (true)
                     {
-                        var title = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "title")?.InnerText;
-                        var loosePrice = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "price numeric used_price")?.InnerText;
-                        var cIBPrice = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "price numeric cib_price")?.InnerText;
-                        var newPrice = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "price numeric new_price")?.InnerText;
+                        var jUrl = PageUrlJson.Replace("{category}", category.URL.Split('/').Last()).Replace("{count}", pageCount.ToString());
+                        var dataJson = await requestHelper.SendRequestAsync(jUrl, headers: headers, useCookieContainer: true);
+                        var jsonObj = JsonConvert.DeserializeObject<Response>(dataJson);
+                        response.AddRange(jsonObj.products);
+                        if (jsonObj.products.Length == 50)
+                        {
+                            pageCount += 50;
+                            Thread.Sleep(100);
+                            continue;
+                        }
+                        break;
+                    }
+
+                    //var document = new HtmlDocument();
+                    //var dataHtml = await requestHelper.SendRequestAsync(category.URL, headers: headers, useCookieContainer: true);
+                    //document.LoadHtml(dataHtml);
+                    //var table = HtmlDocumentHelper.GetNodeByParams(document.DocumentNode, HtmlTag.table, Scrapping.AllPossibilities.Enums.HtmlAttribute.id, "games_table");
+                    //var data = table?.SelectNodes(".//tbody//tr");
+                    //if (data == null) continue;
+                    //foreach (var product in data)
+                    //{
+                    //    var title = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "title")?.InnerText;
+                    //    var loosePrice = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "price numeric used_price")?.InnerText;
+                    //    var cIBPrice = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "price numeric cib_price")?.InnerText;
+                    //    var newPrice = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "price numeric new_price")?.InnerText;
+                    //    categoryData.Add(new Data
+                    //    {
+                    //        Title = title.Trim(' ', '\n'),
+                    //        LoosePrice = loosePrice.Trim(' ', '\n'),
+                    //        CIBPrice = cIBPrice.Trim(' ', '\n'),
+                    //        NewPrice = newPrice.Trim(' ', '\n')
+                    //    });
+                    //}
+                    foreach (var item in response)
+                    {
                         categoryData.Add(new Data
                         {
-                            Title = title.Trim(' ', '\n'),
-                            LoosePrice = loosePrice.Trim(' ', '\n'),
-                            CIBPrice = cIBPrice.Trim(' ', '\n'),
-                            NewPrice = newPrice.Trim(' ', '\n')
+                            Title = item.productName,
+                            LoosePrice = item.price1,
+                            CIBPrice = item.price3,
+                            NewPrice = item.price2
                         });
                     }
                     category.Data = categoryData;
