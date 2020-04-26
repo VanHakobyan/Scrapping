@@ -12,9 +12,20 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Configuration;
 using System.Threading;
+using System.Net;
 
 namespace PriceCharting
 {
+    public static class ExtensionMethods
+    {
+        public static string Replace(this string s, char[] separators, string newVal)
+        {
+            string[] temp;
+
+            temp = s.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            return String.Join(newVal, temp);
+        }
+    }
     class Program
     {
         private const string PageUrl = "http://www.pricecharting.com/";
@@ -121,7 +132,7 @@ namespace PriceCharting
                         }
                         catch
                         {
-                            if (pageCount > 5000) break;
+
                         }
                     }
 
@@ -161,6 +172,60 @@ namespace PriceCharting
                 {
 
                 }
+                // details
+                foreach (var data in category.Data)
+                {
+                    try
+                    {
+                        var url = $"{category.URL.Replace("console", "game")}/{ExtensionMethods.Replace(data.Title, new char[] { '[', ']', '(', ')', '/', '\\', '.', ':'}, "").Replace(' ', '-')}";
+
+                        Thread.Sleep(200);
+                        html = await requestHelper.SendRequestAsync(url, headers: HeaderBuilder.GetDefaultHeaders(), useCookieContainer: true);
+
+                        doc = new HtmlDocument();
+                        doc.LoadHtml(html);
+                        var attributeNode = HtmlDocumentHelper.GetNodeByParams(doc.DocumentNode, HtmlTag.table, Scrapping.AllPossibilities.Enums.HtmlAttribute.id, "attribute");
+                        if (attributeNode != null)
+                        {
+                            var detailNodes = attributeNode.SelectNodes(".//tr");
+                            var genre = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "Genre:");
+                            var releaseDate = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "Release Date:");
+                            var rating = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "ESRB Rating:");
+                            var publisher = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "Publisher:");
+                            var developer = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "Developer:");
+                            var playerCount = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "Player Count:");
+                            var upc = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "UPC:");
+                            var asin = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "ASIN (Amazon):");
+                            var epid = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "ePID (eBay):");
+                            var priceChartingId = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "PriceCharting ID:");
+
+                            if (genre != null)
+                                data.Genre = WebUtility.HtmlDecode(HtmlDocumentHelper.GetNodeByParams(genre, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "details")?.InnerText?.Trim(' ', '\n'));
+                            if (releaseDate != null)
+                                data.ReleaseDate = WebUtility.HtmlDecode(HtmlDocumentHelper.GetNodeByParams(releaseDate, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "details")?.InnerText?.Trim(' ', '\n'));
+                            if (rating != null)
+                                data.Rating = WebUtility.HtmlDecode(HtmlDocumentHelper.GetNodeByParams(rating, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "details")?.InnerText?.Trim(' ', '\n'));
+                            if (publisher != null)
+                                data.Publisher = WebUtility.HtmlDecode(HtmlDocumentHelper.GetNodeByParams(publisher, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "details")?.InnerText?.Trim(' ', '\n'));
+                            if (developer != null)
+                                data.Developer = WebUtility.HtmlDecode(HtmlDocumentHelper.GetNodeByParams(developer, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "details")?.InnerText?.Trim(' ', '\n'));
+                            if (playerCount != null)
+                                data.PlayerCount = WebUtility.HtmlDecode(HtmlDocumentHelper.GetNodeByParams(playerCount, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "details")?.InnerText?.Trim(' ', '\n'));
+                            if (upc != null)
+                                data.UPC = WebUtility.HtmlDecode(HtmlDocumentHelper.GetNodeByParams(upc, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "details")?.InnerText?.Trim(' ', '\n'));
+                            if (asin != null)
+                                data.Amazon_ASIN = WebUtility.HtmlDecode(HtmlDocumentHelper.GetNodeByParams(asin, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "details")?.InnerText?.Trim(' ', '\n'));
+                            if (epid != null)
+                                data.Ebay_ePID = WebUtility.HtmlDecode(HtmlDocumentHelper.GetNodeByParams(epid, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "details")?.InnerText?.Trim(' ', '\n'));
+                            if (priceChartingId != null)
+                                data.PriceChartingId = WebUtility.HtmlDecode(HtmlDocumentHelper.GetNodeByParams(priceChartingId, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "details")?.InnerText?.Trim(' ', '\n'));
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
                 await Task.Delay(500);
             }
             var json = JsonConvert.SerializeObject(result, Formatting.Indented);
@@ -184,8 +249,8 @@ namespace PriceCharting
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+
             }
         }
+        }
     }
-}

@@ -6,6 +6,7 @@ namespace PriceCharting
 {
     public class PriceChartingModel
     {
+        public string SourceCode { get; set; } = "PriceCharting";
         public string CategoryName { get; set; }
         public string Region { get; set; }
         public string URL { get; set; }
@@ -17,6 +18,16 @@ namespace PriceCharting
         public string LoosePrice { get; set; }
         public string CIBPrice { get; set; }
         public string NewPrice { get; set; }
+        public string Genre { get; set; }
+        public string ReleaseDate { get; set; }
+        public string Rating { get; set; }
+        public string Publisher { get; set; }
+        public string Developer { get; set; }
+        public string PlayerCount { get; set; }
+        public string UPC { get; set; }
+        public string Amazon_ASIN { get; set; }
+        public string Ebay_ePID { get; set; }
+        public string PriceChartingId { get; set; }
 
     }
 
