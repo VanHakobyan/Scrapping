@@ -20,10 +20,7 @@ namespace PriceCharting
     {
         public static string Replace(this string s, char[] separators, string newVal)
         {
-            string[] temp;
-
-            temp = s.Split(separators, StringSplitOptions.RemoveEmptyEntries);
-            return String.Join(newVal, temp);
+            return string.Join(newVal, s.Split(separators, StringSplitOptions.RemoveEmptyEntries));
         }
     }
     class Program
@@ -201,7 +198,7 @@ namespace PriceCharting
                         var url = $"{category.URL.Replace("console", "game")}/{ExtensionMethods.Replace(data.Title, new char[] { '[', ']', '(', ')', '/', '\\', '.', ':'}, "").Replace(' ', '-')}";
 
                         Thread.Sleep(200);
-                        html = await requestHelper.SendRequestAsync(url, headers: HeaderBuilder.GetDefaultHeaders(), useCookieContainer: true);
+                        html = await GetData(url);
 
                         doc = new HtmlDocument();
                         doc.LoadHtml(html);
