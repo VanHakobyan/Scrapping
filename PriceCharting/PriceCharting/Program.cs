@@ -185,16 +185,16 @@ namespace PriceCharting
                         if (attributeNode != null)
                         {
                             var detailNodes = attributeNode.SelectNodes(".//tr");
-                            var genre = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "Genre:");
-                            var releaseDate = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "Release Date:");
-                            var rating = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "ESRB Rating:");
-                            var publisher = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "Publisher:");
-                            var developer = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "Developer:");
-                            var playerCount = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "Player Count:");
-                            var upc = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "UPC:");
-                            var asin = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "ASIN (Amazon):");
-                            var epid = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "ePID (eBay):");
-                            var priceChartingId = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td").InnerText == "PriceCharting ID:");
+                            var genre = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td")?.InnerText == "Genre:");
+                            var releaseDate = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td")?.InnerText == "Release Date:");
+                            var rating = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td")?.InnerText == "ESRB Rating:");
+                            var publisher = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td")?.InnerText == "Publisher:");
+                            var developer = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td")?.InnerText == "Developer:");
+                            var playerCount = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td")?.InnerText == "Player Count:");
+                            var upc = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td")?.InnerText == "UPC:");
+                            var asin = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td")?.InnerText == "ASIN (Amazon):");
+                            var epid = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td")?.InnerText == "ePID (eBay):");
+                            var priceChartingId = detailNodes.FirstOrDefault(x => x.SelectSingleNode(".//td")?.InnerText == "PriceCharting ID:");
 
                             if (genre != null)
                                 data.Genre = WebUtility.HtmlDecode(HtmlDocumentHelper.GetNodeByParams(genre, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "details")?.InnerText?.Trim(' ', '\n'));
