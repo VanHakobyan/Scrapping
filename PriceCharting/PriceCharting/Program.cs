@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.Entity;
 using Newtonsoft.Json;
 using System.IO;
 using System.Configuration;
@@ -57,7 +56,7 @@ namespace PriceCharting
                 }
                 catch
                 {
-                    Thread.Sleep(100);
+                    Thread.Sleep(5000);
                     //ignore
                 }
             }
@@ -154,26 +153,6 @@ namespace PriceCharting
                         }
                     }
 
-                    //var document = new HtmlDocument();
-                    //var dataHtml = await requestHelper.SendRequestAsync(category.URL, headers: headers, useCookieContainer: true);
-                    //document.LoadHtml(dataHtml);
-                    //var table = HtmlDocumentHelper.GetNodeByParams(document.DocumentNode, HtmlTag.table, Scrapping.AllPossibilities.Enums.HtmlAttribute.id, "games_table");
-                    //var data = table?.SelectNodes(".//tbody//tr");
-                    //if (data == null) continue;
-                    //foreach (var product in data)
-                    //{
-                    //    var title = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "title")?.InnerText;
-                    //    var loosePrice = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "price numeric used_price")?.InnerText;
-                    //    var cIBPrice = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "price numeric cib_price")?.InnerText;
-                    //    var newPrice = HtmlDocumentHelper.GetNodeByParams(product, HtmlTag.td, Scrapping.AllPossibilities.Enums.HtmlAttribute._class, "price numeric new_price")?.InnerText;
-                    //    categoryData.Add(new Data
-                    //    {
-                    //        Title = title.Trim(' ', '\n'),
-                    //        LoosePrice = loosePrice.Trim(' ', '\n'),
-                    //        CIBPrice = cIBPrice.Trim(' ', '\n'),
-                    //        NewPrice = newPrice.Trim(' ', '\n')
-                    //    });
-                    //}
                     foreach (var item in response)
                     {
                         categoryData.Add(new Data
@@ -195,7 +174,7 @@ namespace PriceCharting
                 {
                     try
                     {
-                        var url = $"{category.URL.Replace("console", "game")}/{ExtensionMethods.Replace(data.Title, new char[] { '[', ']', '(', ')', '/', '\\', '.', ':', ',', '?'}, "").Replace(' ', '-')}";
+                        var url = $"{category.URL.Replace("console", "game")}/{ExtensionMethods.Replace(data.Title, new char[] { '[', ']', '(', ')', '/', '\\', '.', ':', ',', '?' }, "").Replace(' ', '-')}";
 
                         Thread.Sleep(200);
                         html = await GetData(url);
@@ -244,31 +223,34 @@ namespace PriceCharting
 
                     }
                 }
+                await WriteJson(JsonConvert.SerializeObject(category, Formatting.Indented), category.CategoryName);
                 await Task.Delay(500);
             }
-            var json = JsonConvert.SerializeObject(result, Formatting.Indented);
+            await WriteJson(JsonConvert.SerializeObject(result, Formatting.Indented));
+        }
 
+        private static async Task WriteJson(string json, string category = "")
+        {
             if (string.IsNullOrEmpty(FilePath))
             {
                 Console.WriteLine("Wrong file name");
                 return;
             }
 
-            var fullPath = $"{FilePath}{DateTime.Now:yyyyMMdd_hhmmss}.json";
+            var fullPath = $"{FilePath}{category}_{DateTime.Now:yyyyMMdd_hhmmss}.json";
             try
             {
                 using (var stream = new FileStream(fullPath, FileMode.OpenOrCreate))
                 {
                     using (var writer = new StreamWriter(stream, Encoding.UTF8))
                     {
-                        writer.Write(json);
+                        await writer.WriteAsync(json);
                     }
                 }
             }
             catch (Exception ex)
             {
-
             }
         }
-        }
     }
+}
