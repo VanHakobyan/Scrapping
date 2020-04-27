@@ -64,7 +64,7 @@ namespace PriceCharting
                     //ignore
                 }
             }
-
+            Console.WriteLine("Switch to proxy needed");
             return null;
         }
 
@@ -198,10 +198,10 @@ namespace PriceCharting
                 {
                     try
                     {
-                        var url = $"{category.URL.Replace("console", "game")}/{ExtensionMethods.Replace(data.Title, new char[] { '[', ']', '(', ')', '/', '\\', '.', ':'}, "").Replace(' ', '-')}";
+                        var url = $"{category.URL.Replace("console", "game")}/{ExtensionMethods.Replace(data.Title, new char[] { '[', ']', '(', ')', '/', '\\', '.', ':', ',', '?'}, "").Replace(' ', '-')}";
 
                         Thread.Sleep(200);
-                        html = await requestHelper.SendRequestAsync(url, headers: HeaderBuilder.GetDefaultHeaders(), useCookieContainer: true);
+                        html = await GetData(url);
 
                         doc = new HtmlDocument();
                         doc.LoadHtml(html);

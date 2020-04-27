@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace GameValueNow
 {
-    [Table("GameValueNow")]
+  //  [Table("GameValueNow")]
     public class GameValueNowModel
     {
-        [Key]
-        // public int Id { get; set; }
+        //  [Key]
+        public string SourceCode { get; set; } = "GameValueNow";
         public string PlatformName { get; set; }
         public string AvgLoosePrice { get; set; }
         public string AvgCompletePrice { get; set; }
@@ -22,11 +22,9 @@ namespace GameValueNow
         public string URL { get; set; }
         public virtual List<Data> Data { get; set; }
     }
-    [Table("GameData")]
+   // [Table("GameData")]
     public class Data
     {
-    //    [Key] 
-        //public int IndexId { get; set; }
         public string Id { get; set; }
         public string PlatformName { get; set; }
         public string Title { get; set; }
@@ -34,5 +32,15 @@ namespace GameValueNow
         public string Complete { get; set; }
         public string New { get; set; }
         public string Graded { get; set; }
+        public string Genre { get; set; }
+        public string ReleaseDate { get; set; }
+        public string Rating { get; set; }
+        public string Publisher { get; set; }
+        public string Developer { get; set; }
+        public string PlayerCount { get; set; }
+        public string UPC { get; set; }
+        public string Amazon_ASIN { get; set; }
+        public string Ebay_ePID { get; set; }
+        public string PriceChartingId { get; set; }
     }
 }
