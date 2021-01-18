@@ -29,7 +29,7 @@ namespace Scrapper
                 }
                 catch (Exception e)
                 {
-                    File.AppendAllText(@"D:\playstationLog.log",$"{DateTime.Now}: {e}");
+                    File.AppendAllText(@"D:\playstationLog.log",$"{DateTime.Now}: {e}{Environment.NewLine}");
                 }
             }
         }
